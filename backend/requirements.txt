@@ -1,0 +1,10 @@
+fastapi
+fastapi[standard]
+sqlalchemy
+pydantic
+pydantic-settings
+pydantic[email]
+python-jose[cryptography]
+passlib
+asyncpg
+httpx

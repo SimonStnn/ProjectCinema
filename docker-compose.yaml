@@ -1,0 +1,91 @@
+services:
+  frontend:
+    build:
+      context: ./frontend
+    environment:
+      - VITE_API_URL=http://api.cinema.localhost
+      - VITE_MQTT_URL=ws://cinema.localhost/mqtt
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+      - mosquitto
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=Host(`cinema.localhost`)"
+      - "traefik.http.services.frontend.loadbalancer.server.port=3000"
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    volumes:
+      - ./backend:/app
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/cinema
+      - MQTT_BROKER=mosquitto
+      - MQTT_PORT=1883
+      - JWT_SECRET=changeThisInProduction
+      - TMDB_API_KEY=${TMDB_API_KEY}
+      - ENVIRONMENT=development
+      - SECRET_KEY=dev_secret_key_change_in_production
+      - CORS_ORIGINS=http://cinema.localhost
+      - ALLOWED_HOSTS=api.cinema.localhost,localhost
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - mosquitto
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.backend.rule=Host(`api.cinema.localhost`)"
+      - "traefik.http.services.backend.loadbalancer.server.port=8000"
+
+  db:
+    image: postgres:15-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=cinema
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  mosquitto:
+    image: eclipse-mosquitto:2
+    volumes:
+      - ./infra/traefik/config/mosquitto.conf:/mosquitto/config/mosquitto.conf
+    ports:
+      - "1883:1883" # MQTT
+      - "9001:9001" # WebSockets
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.mqtt.rule=Host(`cinema.localhost`) && PathPrefix(`/mqtt`)"
+      - "traefik.http.services.mqtt.loadbalancer.server.port=9001"
+      - "traefik.http.routers.mqtt.service=mqtt"
+      - "traefik.http.middlewares.mqtt-strip.stripprefix.prefixes=/mqtt"
+      - "traefik.http.routers.mqtt.middlewares=mqtt-strip"
+
+  traefik:
+    image: traefik:v2.9
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+    ports:
+      - "80:80"
+      - "8080:8080" # Dashboard
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+volumes:
+  postgres_data:
