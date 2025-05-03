@@ -60,3 +60,7 @@ class TMDBMovie(BaseModel):
     genres: Optional[List[dict]] = None
     vote_average: Optional[float] = None
     vote_count: Optional[int] = None
+    director: Optional[str] = None
+    cast: Optional[List[str]] = None
+    trailer_url: Optional[str] = None
+    status: Optional[str] = None

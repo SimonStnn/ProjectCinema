@@ -10,7 +10,6 @@ from app.db.session import get_db
 from app.models.user import User
 from app.models.movie import Movie
 from app.models.showing import Showing
-from app.models.cinema import Cinema
 from app.models.room import Room
 from app.models.booking import Booking
 
@@ -107,28 +106,14 @@ async def get_all_showings(
     ]
 
 
-@router.post("/cinema", response_model=dict)
-async def create_cinema(
-    cinema_data: dict,
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_admin_user),
-) -> Any:
-    """
-    Create a new cinema (admin only)
-    """
-    # Placeholder implementation - would need proper implementation
-    return {"message": "Cinema created successfully"}
-
-
-@router.post("/room/{cinema_id}", response_model=dict)
+@router.post("/room", response_model=dict)
 async def create_room(
-    cinema_id: UUID,
     room_data: dict,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_admin_user),
 ) -> Any:
     """
-    Create a new room in a cinema (admin only)
+    Create a new room in the cinema (admin only)
     """
     # Placeholder implementation - would need proper implementation
     return {"message": "Room created successfully"}

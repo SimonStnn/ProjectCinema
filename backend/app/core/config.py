@@ -1,14 +1,14 @@
 import os
 import secrets
-from typing import Any, Dict, List, Optional, Union
+from typing import List, Optional, Union
 
 from pydantic import (
     EmailStr,
     Field,
     PostgresDsn,
-    validator,
+    field_validator,
 )
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
@@ -29,7 +29,7 @@ class Settings(BaseSettings):
     MQTT_PORT: int = 1883
 
     # TMDB configuration
-    TMDB_API_KEY: Optional[str] = None
+    TMDB_API_KEY: str = Field("NOT_A_SECRET")
     TMDB_API_BASE_URL: str = "https://api.themoviedb.org/3"
 
     # Environment
@@ -48,15 +48,17 @@ class Settings(BaseSettings):
     EMAILS_FROM_EMAIL: Optional[EmailStr] = None
     EMAILS_FROM_NAME: Optional[str] = None
 
-    @validator("CORS_ORIGINS", pre=True)
+    @field_validator("CORS_ORIGINS", mode="before")
+    @classmethod
     def assemble_cors_origins(cls, v: Union[str, List[str]]) -> Union[List[str], str]:
         if isinstance(v, str) and not v.startswith("["):
             return [i.strip() for i in v.split(",")]
-        elif isinstance(v, (list, str)):
+        if isinstance(v, (list, str)):
             return v
         raise ValueError(v)
 
-    @validator("ALLOWED_HOSTS", pre=True)
+    @field_validator("ALLOWED_HOSTS", mode="before")
+    @classmethod
     def assemble_allowed_hosts(cls, v: Union[str, List[str]]) -> List[str]:
         if isinstance(v, str):
             return [host.strip() for host in v.split(",")]
@@ -68,6 +70,9 @@ class Settings(BaseSettings):
 
 
 settings = Settings(
-    DATABASE_URL=os.getenv("DATABASE_URL", "postgresql://user:password@localhost/dbname"), # type: ignore
+    DATABASE_URL=os.getenv("DATABASE_URL", "postgresql://postgres:postgres@localhost:5432/cinema"),  # type: ignore
     JWT_SECRET=os.getenv("JWT_SECRET", "NOT_A_SECRET"),
+    TMDB_API_KEY="995ebcf9d5249c3ccdbd4b689c4b5a3f",
 )
+
+print("Settings loaded:", settings.TMDB_API_KEY)  # Debugging line to check loaded settings

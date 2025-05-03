@@ -166,7 +166,7 @@ const MovieListPage = () => {
       {/* Filters Section */}
       <Paper sx={{ p: 3, mb: 4, borderRadius: 2 }}>
         <Grid container spacing={3} alignItems="center">
-          <Grid item xs={12} md={6}>
+          <Grid>
             <form onSubmit={handleSearchSubmit}>
               <TextField
                 fullWidth
@@ -184,7 +184,7 @@ const MovieListPage = () => {
             </form>
           </Grid>
 
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid>
             <FormControl fullWidth disabled={!!searchQuery}>
               <InputLabel id="category-select-label">Category</InputLabel>
               <Select
@@ -204,7 +204,7 @@ const MovieListPage = () => {
             </FormControl>
           </Grid>
 
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid>
             <FormControl fullWidth>
               <InputLabel id="sort-select-label">Sort By</InputLabel>
               <Select
@@ -261,7 +261,7 @@ const MovieListPage = () => {
         <>
           <Grid container spacing={3}>
             {movies.map((movie) => (
-              <Grid item key={movie.id} xs={12} sm={6} md={4} lg={3}>
+              <Grid key={movie.id}>
                 <MovieCard
                   movie={movie}
                   onClick={() => handleMovieClick(movie.id)}

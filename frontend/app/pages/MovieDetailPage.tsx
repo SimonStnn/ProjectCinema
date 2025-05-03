@@ -39,28 +39,18 @@ interface Movie {
   genres: { id: number; name: string }[];
 }
 
-interface Cinema {
-  id: string;
-  name: string;
-  address: string;
-}
-
 interface Showing {
   id: string;
   movie_id: number;
-  cinema_id: string;
   room_id: string;
   start_time: string;
   end_time: string;
   price: number;
-  cinema_name: string;
   room_name: string;
 }
 
 interface ShowingsByDate {
-  [date: string]: {
-    [cinemaId: string]: Showing[];
-  };
+  [date: string]: Showing[];
 }
 
 const MovieDetailPage = () => {
@@ -68,24 +58,19 @@ const MovieDetailPage = () => {
   const navigate = useNavigate();
   const [movie, setMovie] = useState<Movie | null>(null);
   const [showings, setShowings] = useState<Showing[]>([]);
-  const [cinemas, setCinemas] = useState<Cinema[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState<string>("");
-  const [selectedCinema, setSelectedCinema] = useState<string>("");
 
-  // Group showings by date and cinema
+  // Group showings by date
   const showingsByDate: ShowingsByDate = {};
   showings.forEach((showing) => {
     // Get date part only
     const date = showing.start_time.split("T")[0];
     if (!showingsByDate[date]) {
-      showingsByDate[date] = {};
+      showingsByDate[date] = [];
     }
-    if (!showingsByDate[date][showing.cinema_id]) {
-      showingsByDate[date][showing.cinema_id] = [];
-    }
-    showingsByDate[date][showing.cinema_id].push(showing);
+    showingsByDate[date].push(showing);
   });
 
   // Get unique dates for filtering
@@ -109,8 +94,10 @@ const MovieDetailPage = () => {
         const API_URL =
           (import.meta as any).env?.VITE_API_URL || "http://localhost:8000";
 
-        // Fetch movie details
-        const movieResponse = await fetch(`${API_URL}/api/v1/movies/${id}`);
+        // Fetch movie details - use by-tmdb-id endpoint since we're getting a TMDB ID from the URL
+        const movieResponse = await fetch(
+          `${API_URL}/api/v1/movies/tmdb/${id}`
+        );
         if (!movieResponse.ok) {
           throw new Error(`Failed to fetch movie: ${movieResponse.statusText}`);
         }
@@ -131,17 +118,6 @@ const MovieDetailPage = () => {
         const showingsData = await showingsResponse.json();
         setShowings(showingsData);
 
-        // Fetch all cinemas
-        const cinemasResponse = await fetch(`${API_URL}/api/v1/cinemas`);
-        if (!cinemasResponse.ok) {
-          throw new Error(
-            `Failed to fetch cinemas: ${cinemasResponse.statusText}`
-          );
-        }
-
-        const cinemasData = await cinemasResponse.json();
-        setCinemas(cinemasData);
-
         setLoading(false);
       } catch (err) {
         setError(err instanceof Error ? err.message : "An error occurred");
@@ -154,11 +130,6 @@ const MovieDetailPage = () => {
 
   const handleDateChange = (event: SelectChangeEvent) => {
     setSelectedDate(event.target.value);
-    setSelectedCinema("");
-  };
-
-  const handleCinemaChange = (event: SelectChangeEvent) => {
-    setSelectedCinema(event.target.value);
   };
 
   const handleBookingClick = (showingId: string) => {
@@ -253,7 +224,7 @@ const MovieDetailPage = () => {
       >
         <Container maxWidth="xl">
           <Grid container spacing={4} sx={{ mb: 4 }}>
-            <Grid item xs={12} md={3}>
+            <Grid>
               <Box
                 component="img"
                 src={
@@ -271,7 +242,7 @@ const MovieDetailPage = () => {
                 }}
               />
             </Grid>
-            <Grid item xs={12} md={9} sx={{ color: "white" }}>
+            <Grid sx={{ color: "white" }}>
               <Typography variant="h3" component="h1" gutterBottom>
                 {movie.title}
               </Typography>
@@ -356,7 +327,7 @@ const MovieDetailPage = () => {
           <>
             <Paper sx={{ p: 3, mb: 4, borderRadius: 2 }}>
               <Grid container spacing={2} alignItems="center">
-                <Grid item xs={12} md={6}>
+                <Grid>
                   <FormControl fullWidth>
                     <InputLabel id="date-select-label">Select Date</InputLabel>
                     <Select
@@ -374,132 +345,54 @@ const MovieDetailPage = () => {
                     </Select>
                   </FormControl>
                 </Grid>
-
-                <Grid item xs={12} md={6}>
-                  <FormControl fullWidth disabled={!selectedDate}>
-                    <InputLabel id="cinema-select-label">
-                      Select Cinema
-                    </InputLabel>
-                    <Select
-                      labelId="cinema-select-label"
-                      id="cinema-select"
-                      value={selectedCinema}
-                      label="Select Cinema"
-                      onChange={handleCinemaChange}
-                    >
-                      <MenuItem value="">All Cinemas</MenuItem>
-                      {selectedDate &&
-                        Object.keys(showingsByDate[selectedDate] || {}).map(
-                          (cinemaId) => {
-                            const cinema = cinemas.find(
-                              (c) => c.id === cinemaId
-                            );
-                            return (
-                              <MenuItem key={cinemaId} value={cinemaId}>
-                                {cinema ? cinema.name : "Unknown Cinema"}
-                              </MenuItem>
-                            );
-                          }
-                        )}
-                    </Select>
-                  </FormControl>
-                </Grid>
               </Grid>
             </Paper>
 
             {selectedDate && (
               <Box>
-                {Object.entries(showingsByDate[selectedDate] || {})
-                  .filter(
-                    ([cinemaId]) =>
-                      !selectedCinema || cinemaId === selectedCinema
-                  )
-                  .map(([cinemaId, cinemaShowings]) => {
-                    const cinema = cinemas.find((c) => c.id === cinemaId);
-                    return (
+                <Typography variant="h5" gutterBottom>
+                  {formatDate(selectedDate)}
+                </Typography>
+
+                <Grid container spacing={3}>
+                  {showingsByDate[selectedDate]?.map((showing) => (
+                    <Grid item key={showing.id} xs={12} sm={6} md={4} lg={3}>
                       <Card
-                        key={cinemaId}
-                        sx={{ mb: 3, boxShadow: 2, borderRadius: 2 }}
+                        sx={{
+                          height: "100%",
+                          display: "flex",
+                          flexDirection: "column",
+                        }}
                       >
-                        <CardContent>
+                        <CardContent sx={{ flexGrow: 1 }}>
                           <Typography variant="h6" gutterBottom>
-                            {cinema ? cinema.name : "Unknown Cinema"}
+                            {formatShowtime(showing.start_time)}
                           </Typography>
-                          {cinema && (
-                            <Typography
-                              variant="body2"
-                              color="text.secondary"
-                              paragraph
-                            >
-                              {cinema.address}
-                            </Typography>
-                          )}
-
-                          <Divider sx={{ my: 2 }} />
-
-                          <Grid container spacing={2}>
-                            {cinemaShowings
-                              .sort(
-                                (a, b) =>
-                                  new Date(a.start_time).getTime() -
-                                  new Date(b.start_time).getTime()
-                              )
-                              .map((showing) => (
-                                <Grid
-                                  item
-                                  key={showing.id}
-                                  xs={6}
-                                  sm={4}
-                                  md={3}
-                                >
-                                  <Button
-                                    variant="outlined"
-                                    color="primary"
-                                    fullWidth
-                                    onClick={() =>
-                                      handleBookingClick(showing.id)
-                                    }
-                                    sx={{
-                                      p: 1,
-                                      display: "flex",
-                                      flexDirection: "column",
-                                      alignItems: "center",
-                                      height: "100%",
-                                    }}
-                                  >
-                                    <Typography variant="h6">
-                                      {formatShowtime(showing.start_time)}
-                                    </Typography>
-                                    <Box
-                                      sx={{
-                                        display: "flex",
-                                        alignItems: "center",
-                                        mt: 1,
-                                      }}
-                                    >
-                                      <SeatIcon
-                                        fontSize="small"
-                                        sx={{ mr: 0.5 }}
-                                      />
-                                      <Typography variant="body2">
-                                        {showing.room_name}
-                                      </Typography>
-                                    </Box>
-                                    <Typography
-                                      variant="body2"
-                                      color="text.secondary"
-                                      sx={{ mt: 1 }}
-                                    >
-                                      ${showing.price.toFixed(2)}
-                                    </Typography>
-                                  </Button>
-                                </Grid>
-                              ))}
-                          </Grid>
+                          <Typography
+                            variant="body2"
+                            color="text.secondary"
+                            gutterBottom
+                          >
+                            Room: {showing.room_name}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            Price: ${showing.price.toFixed(2)}
+                          </Typography>
                         </CardContent>
+                        <Box sx={{ p: 2, pt: 0 }}>
+                          <Button
+                            variant="contained"
+                            fullWidth
+                            startIcon={<SeatIcon />}
+                            onClick={() => handleBookingClick(showing.id)}
+                          >
+                            Select Seats
+                          </Button>
+                        </Box>
                       </Card>
-                    );
-                  })}
+                    </Grid>
+                  ))}
+                </Grid>
               </Box>
             )}
           </>

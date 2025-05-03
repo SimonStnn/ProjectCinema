@@ -34,9 +34,6 @@ class UserInDBBase(UserBase):
 class User(UserInDBBase):
     """User data returned to clients"""
 
-    pass
-
-
 class UserInDB(UserInDBBase):
     """User data stored in DB"""
 

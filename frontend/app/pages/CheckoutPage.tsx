@@ -31,7 +31,6 @@ interface BookingDetails {
   movieTitle: string;
   posterPath: string | null;
   showingId: string;
-  cinemaName: string;
   roomName: string;
   showtime: string;
   seats: string[];
@@ -49,6 +48,7 @@ const CheckoutPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean>(false);
   const [activeStep, setActiveStep] = useState(0);
+  const cinemaName = "Grand Cinema"; // Use static cinema name
 
   const [paymentInfo, setPaymentInfo] = useState({
     cardNumber: "",
@@ -72,7 +72,6 @@ const CheckoutPage = () => {
         movieTitle: "Example Movie",
         posterPath: null,
         showingId: "showing123",
-        cinemaName: "Cinema City",
         roomName: "Room 1",
         showtime: "May 5, 2025, 7:30 PM",
         seats: ["A1", "A2"],
@@ -335,7 +334,7 @@ const CheckoutPage = () => {
                       {bookingDetails.movieTitle}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                      {bookingDetails.cinemaName} | {bookingDetails.roomName}
+                      {cinemaName} | {bookingDetails.roomName}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
                       {bookingDetails.showtime}

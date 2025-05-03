@@ -36,8 +36,10 @@ services:
     ports:
       - "8000:8000"
     depends_on:
-      - db
-      - mosquitto
+      db:
+        condition: service_healthy
+      mosquitto:
+        condition: service_started
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.backend.rule=Host(`api.cinema.localhost`)"
@@ -87,5 +89,22 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
 
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@cinema.com
+      - PGADMIN_DEFAULT_PASSWORD=admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - db
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.pgadmin.rule=Host(`pgadmin.cinema.localhost`)"
+      - "traefik.http.services.pgadmin.loadbalancer.server.port=80"
+
 volumes:
   postgres_data:
+  pgadmin_data:

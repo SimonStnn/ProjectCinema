@@ -11,7 +11,7 @@ const Footer = () => {
     >
       <Container maxWidth="lg">
         <Grid container spacing={4}>
-          <Grid item xs={12} sm={4}>
+          <Grid>
             <Typography variant="h6" gutterBottom>
               Project Cinema
             </Typography>
@@ -34,7 +34,7 @@ const Footer = () => {
               </Link>
             </Box>
           </Grid>
-          <Grid item xs={12} sm={4}>
+          <Grid>
             <Typography variant="h6" gutterBottom>
               Quick Links
             </Typography>
@@ -64,7 +64,7 @@ const Footer = () => {
               Promotions
             </Link>
           </Grid>
-          <Grid item xs={12} sm={4}>
+          <Grid>
             <Typography variant="h6" gutterBottom>
               Help & Info
             </Typography>

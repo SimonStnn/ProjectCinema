@@ -36,7 +36,7 @@ import {
 } from "@mui/icons-material";
 import { useAuthStore } from "../store/authStore";
 import AdminMovieList from "../components/admin/AdminMovieList";
-import AdminCinemaList from "../components/admin/AdminCinemaList";
+import CinemaSettings from "../components/admin/AdminCinemaList";
 import AdminShowingList from "../components/admin/AdminShowingList";
 import AdminUserList from "../components/admin/AdminUserList";
 import AdminBookingList from "../components/admin/AdminBookingList";
@@ -84,7 +84,7 @@ const AdminDashboardPage = () => {
   const menuItems = [
     { text: "Dashboard", icon: <DashboardIcon />, path: "" },
     { text: "Movies", icon: <MovieIcon />, path: "/movies" },
-    { text: "Cinemas", icon: <TheaterIcon />, path: "/cinemas" },
+    { text: "Rooms", icon: <TheaterIcon />, path: "/cinema" },
     { text: "Showings", icon: <EventIcon />, path: "/showings" },
     { text: "Users", icon: <UsersIcon />, path: "/users" },
     { text: "Bookings", icon: <BookingIcon />, path: "/bookings" },
@@ -242,7 +242,7 @@ const AdminDashboardPage = () => {
           <Routes>
             <Route path="" element={<AdminDashboardHome />} />
             <Route path="/movies" element={<AdminMovieList />} />
-            <Route path="/cinemas" element={<AdminCinemaList />} />
+            <Route path="/cinema" element={<CinemaSettings />} />
             <Route path="/showings" element={<AdminShowingList />} />
             <Route path="/users" element={<AdminUserList />} />
             <Route path="/bookings" element={<AdminBookingList />} />

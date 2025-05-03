@@ -53,7 +53,7 @@ export const useAuthStore = create<AuthState>()(
         try {
           set({ loading: true, error: null });
 
-          const response = await axios.post(`${API_URL}/api/auth/login`, {
+          const response = await axios.post(`${API_URL}/api/v1/auth/login`, {
             email,
             password,
           });
@@ -97,7 +97,7 @@ export const useAuthStore = create<AuthState>()(
         try {
           set({ loading: true, error: null });
 
-          const response = await axios.post(`${API_URL}/api/auth/register`, {
+          const response = await axios.post(`${API_URL}/api/v1/auth/register`, {
             name,
             email,
             password,
@@ -171,7 +171,7 @@ export const useAuthStore = create<AuthState>()(
           axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
           // Verify token with backend
-          await axios.get(`${API_URL}/api/auth/me`);
+          await axios.get(`${API_URL}/api/v1/auth/me`);
 
           const user: User = {
             id: decoded.sub,

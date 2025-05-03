@@ -7,10 +7,12 @@ import {
   Rating,
   // Chip,
 } from "@mui/material";
+import { type ClassValue } from "clsx";
 import {
   format,
   // parseISO
 } from "date-fns";
+import { cn } from "~/lib/utils";
 
 interface Movie {
   id: number;
@@ -24,10 +26,11 @@ interface Movie {
 
 interface MovieCardProps {
   movie: Movie;
+  className?: ClassValue;
   onClick: () => void;
 }
 
-const MovieCard = ({ movie, onClick }: MovieCardProps) => {
+const MovieCard = ({ movie, className, onClick }: MovieCardProps) => {
   // Format release date
   const formattedDate = movie.release_date
     ? format(new Date(movie.release_date), "MMM d, yyyy")
@@ -55,6 +58,7 @@ const MovieCard = ({ movie, onClick }: MovieCardProps) => {
         },
       }}
       onClick={onClick}
+      className={cn("w-60", className)}
     >
       <CardMedia
         component="img"

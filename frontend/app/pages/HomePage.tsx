@@ -10,6 +10,14 @@ import {
 } from "@mui/material";
 import { useNavigate } from "react-router";
 import MovieCard from "../components/movies/MovieCard";
+import type { Route } from "../+types/root";
+
+export function meta({}: Route.MetaArgs) {
+  return [
+    { title: "Project Cinema" },
+    { name: "description", content: "Vives IoT Devices: Project Cinema" },
+  ];
+}
 
 interface Movie {
   id: number;
@@ -40,12 +48,12 @@ const HomePage = () => {
 
         // Fetch featured (now playing) movies
         const featuredResponse = await fetch(
-          `${API_URL}/api/v1/movies/now_playing?limit=4`
+          `${API_URL}/api/v1/movies/now_playing`
         );
 
         // Fetch upcoming movies
         const upcomingResponse = await fetch(
-          `${API_URL}/api/v1/movies/upcoming?limit=4`
+          `${API_URL}/api/v1/movies/upcoming`
         );
 
         if (!featuredResponse.ok || !upcomingResponse.ok) {
@@ -55,8 +63,8 @@ const HomePage = () => {
         const featuredData = await featuredResponse.json();
         const upcomingData = await upcomingResponse.json();
 
-        setFeaturedMovies(featuredData.results || []);
-        setUpcomingMovies(upcomingData.results || []);
+        setFeaturedMovies(featuredData || []);
+        setUpcomingMovies(upcomingData || []);
         setLoading(false);
       } catch (err) {
         setError(err instanceof Error ? err.message : "An error occurred");
@@ -154,12 +162,10 @@ const HomePage = () => {
         ) : (
           <Grid container spacing={3}>
             {featuredMovies.map((movie) => (
-              <Grid item key={movie.id} xs={12} sm={6} md={3}>
-                <MovieCard
+                <MovieCard key={movie.id}
                   movie={movie}
                   onClick={() => handleMovieClick(movie.id)}
                 />
-              </Grid>
             ))}
           </Grid>
         )}
@@ -205,7 +211,7 @@ const HomePage = () => {
         ) : (
           <Grid container spacing={3}>
             {upcomingMovies.map((movie) => (
-              <Grid item key={movie.id} xs={12} sm={6} md={3}>
+              <Grid key={movie.id}>
                 <MovieCard
                   movie={movie}
                   onClick={() => handleMovieClick(movie.id)}
@@ -227,7 +233,7 @@ const HomePage = () => {
         }}
       >
         <Grid container spacing={4} alignItems="center">
-          <Grid item xs={12} md={8}>
+          <Grid>
             <Typography variant="h4" gutterBottom>
               Membership Benefits
             </Typography>
@@ -239,7 +245,7 @@ const HomePage = () => {
               Sign Up Now
             </Button>
           </Grid>
-          <Grid item xs={12} md={4}>
+          <Grid>
             <Box
               sx={{
                 height: "200px",

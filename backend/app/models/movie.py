@@ -21,6 +21,10 @@ class Movie(Base):
     genres = Column(ARRAY(String), nullable=True)
     vote_average = Column(Float, nullable=True)
     vote_count = Column(Integer, nullable=True)
+    director = Column(String, nullable=True)
+    cast = Column(ARRAY(String), nullable=True)
+    trailer_url = Column(String, nullable=True)
+    status = Column(String, nullable=True, default="Released")
 
     # Timestamps
     created_at = Column(DateTime, default=datetime.utcnow)

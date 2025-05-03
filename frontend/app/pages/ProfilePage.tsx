@@ -56,7 +56,6 @@ interface Booking {
   id: string;
   movie_title: string;
   poster_path: string | null;
-  cinema_name: string;
   room_name: string;
   showing_time: string;
   seats: string[];
@@ -72,6 +71,7 @@ const ProfilePage = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const cinemaName = "Grand Cinema"; // Static cinema name
 
   useEffect(() => {
     // Check if user is logged in
@@ -318,7 +318,7 @@ const ProfilePage = () => {
                                 {formatDate(booking.showing_time)}
                               </Typography>
                               <Typography variant="body1">
-                                <strong>Venue:</strong> {booking.cinema_name} (
+                                <strong>Venue:</strong> {cinemaName} (
                                 {booking.room_name})
                               </Typography>
                               <Typography variant="body1">
@@ -449,16 +449,12 @@ const ProfilePage = () => {
                                 {formatDate(booking.showing_time)}
                               </Typography>
                               <Typography variant="body1">
-                                <strong>Venue:</strong> {booking.cinema_name} (
+                                <strong>Venue:</strong> {cinemaName} (
                                 {booking.room_name})
                               </Typography>
                               <Typography variant="body1">
                                 <strong>Seats:</strong>{" "}
                                 {booking.seats.join(", ")}
-                              </Typography>
-                              <Typography variant="body1">
-                                <strong>Booking Reference:</strong>{" "}
-                                {booking.id.substring(0, 8).toUpperCase()}
                               </Typography>
                               <Typography
                                 variant="body2"

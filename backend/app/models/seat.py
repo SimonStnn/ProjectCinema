@@ -7,8 +7,10 @@ from sqlalchemy import (
     DateTime,
     UniqueConstraint,
 )
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from datetime import datetime
+import uuid
 
 from app.db.session import Base
 
@@ -20,9 +22,9 @@ class Seat(Base):
 
     __tablename__ = "seats"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     room_id = Column(
-        Integer, ForeignKey("rooms.id", ondelete="CASCADE"), nullable=False
+        UUID(as_uuid=True), ForeignKey("rooms.id", ondelete="CASCADE"), nullable=False
     )
     row = Column(String(5), nullable=False)  # e.g., "A", "B", "C", etc.
     number = Column(Integer, nullable=False)  # e.g., 1, 2, 3, etc.

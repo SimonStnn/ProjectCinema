@@ -65,13 +65,13 @@ const NavigationBar = () => {
       </Typography>
       <Divider />
       <List>
-        <ListItem button component={RouterLink} to="/">
+        <ListItem component={RouterLink} to="/">
           <ListItemIcon>
             <Home />
           </ListItemIcon>
           <ListItemText primary="Home" />
         </ListItem>
-        <ListItem button component={RouterLink} to="/movies">
+        <ListItem component={RouterLink} to="/movies">
           <ListItemIcon>
             <Movie />
           </ListItemIcon>
@@ -79,21 +79,21 @@ const NavigationBar = () => {
         </ListItem>
         {isAuthenticated ? (
           <>
-            <ListItem button component={RouterLink} to="/profile">
+            <ListItem component={RouterLink} to="/profile">
               <ListItemIcon>
                 <Person />
               </ListItemIcon>
               <ListItemText primary="Profile" />
             </ListItem>
             {isAdmin && (
-              <ListItem button component={RouterLink} to="/admin">
+              <ListItem component={RouterLink} to="/admin">
                 <ListItemIcon>
                   <AdminPanelSettings />
                 </ListItemIcon>
                 <ListItemText primary="Admin" />
               </ListItem>
             )}
-            <ListItem button onClick={handleLogout}>
+            <ListItem onClick={handleLogout}>
               <ListItemIcon>
                 <Logout />
               </ListItemIcon>
@@ -102,13 +102,13 @@ const NavigationBar = () => {
           </>
         ) : (
           <>
-            <ListItem button component={RouterLink} to="/login">
+            <ListItem component={RouterLink} to="/login">
               <ListItemIcon>
                 <Login />
               </ListItemIcon>
               <ListItemText primary="Login" />
             </ListItem>
-            <ListItem button component={RouterLink} to="/register">
+            <ListItem component={RouterLink} to="/register">
               <ListItemIcon>
                 <Person />
               </ListItemIcon>

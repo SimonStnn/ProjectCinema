@@ -4,13 +4,9 @@ import {
   Container,
   Box,
   Typography,
-  //   Stepper,
-  //   Step,
-  //   StepLabel,
   Paper,
   Button,
   CircularProgress,
-  //   Divider,
 } from "@mui/material";
 import { useAuthStore } from "../store/authStore";
 import SeatSelection from "../components/booking/SeatSelection";
@@ -25,8 +21,6 @@ interface Movie {
 interface Showing {
   id: string;
   movie_id: number;
-  cinema_id: string;
-  cinema_name: string;
   room_id: string;
   room_name: string;
   start_time: string;
@@ -45,6 +39,7 @@ const BookingPage = () => {
   const [showing, setShowing] = useState<Showing | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const cinemaName = "Grand Cinema"; // Use static cinema name
 
   // Fetch movie and showing data
   useEffect(() => {
@@ -199,7 +194,7 @@ const BookingPage = () => {
               {movie.title}
             </Typography>
             <Typography variant="body1">
-              {showing.cinema_name} | {showing.room_name} |{" "}
+              {cinemaName} | {showing.room_name} |{" "}
               {formatShowtime(showing.start_time)}
             </Typography>
           </Box>
@@ -211,7 +206,7 @@ const BookingPage = () => {
         showingId={showing.id}
         movieTitle={movie.title}
         showtime={formatShowtime(showing.start_time)}
-        cinemaName={showing.cinema_name}
+        cinemaName={cinemaName}
         roomName={showing.room_name}
         price={showing.price}
         userId={user.id}

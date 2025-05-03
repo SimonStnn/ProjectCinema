@@ -4,14 +4,22 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from sqlalchemy import or_
+from sqlalchemy import or_, join
 
 from app.core.security import get_current_user, get_current_admin_user
 from app.db.session import get_db
 from app.models.movie import Movie
 from app.models.user import User
+from app.models.showing import Showing
+from app.models.room import Room
 from app.schemas.movie import Movie as MovieSchema, MovieCreate, MovieDetail, TMDBMovie
-from app.services.tmdb_service import tmdb_service
+from app.core.config import settings
+
+
+import tmdbsimple as tmdb
+
+tmdb.API_KEY = settings.TMDB_API_KEY
+
 
 router = APIRouter(prefix="/movies", tags=["movies"])
 
@@ -47,68 +55,102 @@ async def get_movies(
     return movies
 
 
-@router.get("/now-playing", response_model=List[TMDBMovie])
+@router.get("/now_playing", response_model=List[TMDBMovie])
 async def get_now_playing_movies(
     page: int = Query(1, ge=1, le=1000),
+    sort_by: str = Query(
+        "popularity.desc", description="Sort results by specified criteria"
+    ),
 ) -> Any:
     """
     Get movies currently in theaters from TMDB
     """
-    response = await tmdb_service.get_now_playing(page=page)
-    return response.get("results", [])
+    collection = tmdb.Movies()
+    now_playing = collection.now_playing(page=page, sort_by=sort_by)
+    return now_playing["results"]
 
 
 @router.get("/upcoming", response_model=List[TMDBMovie])
 async def get_upcoming_movies(
     page: int = Query(1, ge=1, le=1000),
+    sort_by: str = Query(
+        "popularity.desc", description="Sort results by specified criteria"
+    ),
 ) -> Any:
     """
     Get upcoming movies from TMDB
     """
-    response = await tmdb_service.get_upcoming(page=page)
-    return response.get("results", [])
+    collection = tmdb.Movies()
+    upcoming = collection.upcoming(page=page, sort_by=sort_by)
+    return upcoming["results"]
 
 
 @router.get("/popular", response_model=List[TMDBMovie])
 async def get_popular_movies(
     page: int = Query(1, ge=1, le=1000),
+    sort_by: str = Query(
+        "popularity.desc", description="Sort results by specified criteria"
+    ),
 ) -> Any:
     """
     Get popular movies from TMDB
     """
-    response = await tmdb_service.get_popular(page=page)
-    return response.get("results", [])
+    collection = tmdb.Movies()
+    popular = collection.popular(page=page, sort_by=sort_by)
+    return popular["results"]
+
+
+@router.get("/top_rated", response_model=List[TMDBMovie])
+async def get_top_rated_movies(
+    page: int = Query(1, ge=1, le=1000),
+    sort_by: str = Query(
+        "popularity.desc", description="Sort results by specified criteria"
+    ),
+) -> Any:
+    """
+    Get top rated movies from TMDB
+    """
+    collection = tmdb.Movies()
+    top_rated = collection.top_rated(page=page, sort_by=sort_by)
+    return top_rated["results"]
 
 
 @router.get("/search", response_model=List[TMDBMovie])
 async def search_movies(
     query: str = Query(..., min_length=1),
     page: int = Query(1, ge=1, le=1000),
+    sort_by: str = Query(
+        "popularity.desc", description="Sort results by specified criteria"
+    ),
 ) -> Any:
     """
     Search for movies in TMDB
     """
-    response = await tmdb_service.search_movies(query=query, page=page)
-    return response.get("results", [])
+    collection = tmdb.Search()
+    search_results = collection.movie(query=query, page=page, sort_by=sort_by)
+    if not search_results["results"]:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No movies found",
+        )
+    return search_results["results"]
 
 
 @router.get("/{movie_id}", response_model=MovieDetail)
 async def get_movie(
-    movie_id: UUID,
+    movie_id: int,
     db: AsyncSession = Depends(get_db),
 ) -> Any:
     """
     Get details for a specific movie
     """
-    result = await db.execute(select(Movie).filter(Movie.id == movie_id))
-    movie = result.scalars().first()
-
+    collection = tmdb.Movies(movie_id)
+    movie = collection.info()
     if not movie:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Movie not found",
         )
-
     return movie
 
 
@@ -119,7 +161,14 @@ async def get_movie_from_tmdb(
     """
     Get a movie from TMDB by its ID
     """
-    return await tmdb_service.get_movie(movie_id=tmdb_id)
+    collection = tmdb.Movies(tmdb_id)
+    movie = collection.info()
+    if not movie:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Movie not found",
+        )
+    return movie
 
 
 @router.post("/", response_model=MovieSchema, status_code=status.HTTP_201_CREATED)
@@ -148,46 +197,57 @@ async def create_movie(
     return movie
 
 
-@router.post(
-    "/import-from-tmdb/{tmdb_id}",
-    response_model=MovieSchema,
-    status_code=status.HTTP_201_CREATED,
-)
-async def import_movie_from_tmdb(
-    tmdb_id: int,
+@router.get("/showings", response_model=List[dict])
+async def get_movie_showings(
+    movie_id: int = Query(..., description="TMDB ID of the movie"),
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_admin_user),
 ) -> Any:
     """
-    Import a movie from TMDB (admin only)
+    Get all showings for a specific movie
     """
-    # Check if movie already exists
-    result = await db.execute(select(Movie).filter(Movie.tmdb_id == tmdb_id))
-    if result.scalars().first():
+    # First get the movie from our database
+    result = await db.execute(select(Movie).filter(Movie.tmdb_id == movie_id))
+    movie = result.scalars().first()
+
+    if not movie:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Movie with this TMDB ID already exists",
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Movie not found in the database",
         )
 
-    # Fetch movie data from TMDB
-    tmdb_movie = await tmdb_service.get_movie(movie_id=tmdb_id)
-
-    # Create the movie in our database
-    movie = Movie(
-        tmdb_id=tmdb_movie.get("id"),
-        title=tmdb_movie.get("title"),
-        overview=tmdb_movie.get("overview"),
-        poster_path=tmdb_movie.get("poster_path"),
-        backdrop_path=tmdb_movie.get("backdrop_path"),
-        release_date=tmdb_service.parse_release_date(tmdb_movie.get("release_date")),
-        runtime=tmdb_movie.get("runtime"),
-        genres=tmdb_service.extract_genre_names(tmdb_movie.get("genres", [])),
-        vote_average=tmdb_movie.get("vote_average"),
-        vote_count=tmdb_movie.get("vote_count"),
+    # Query showings with joined information about rooms
+    query = (
+        select(
+            Showing.id,
+            Showing.movie_id,
+            Showing.start_time,
+            Showing.end_time,
+            Showing.price,
+            Showing.status,
+            Room.id.label("room_id"),
+            Room.name.label("room_name"),
+        )
+        .select_from(Showing)
+        .join(Room, Showing.room_id == Room.id)
+        .filter(Showing.movie_id == movie.id)
+        .filter(Showing.status == "scheduled")
     )
 
-    db.add(movie)
-    await db.commit()
-    await db.refresh(movie)
+    result = await db.execute(query)
+    showings = result.all()
 
-    return movie
+    # Convert to list of dictionaries
+    showings_list = [
+        {
+            "id": str(showing.id),
+            "movie_id": int(movie_id),  # Use TMDB ID for frontend consistency
+            "room_id": str(showing.room_id),
+            "room_name": showing.room_name,
+            "start_time": showing.start_time.isoformat(),
+            "end_time": showing.end_time.isoformat(),
+            "price": float(showing.price),
+        }
+        for showing in showings
+    ]
+
+    return showings_list
