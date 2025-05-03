@@ -165,7 +165,7 @@ const LoginPage = () => {
               )}
             </Button>
             <Grid container>
-              <Grid item xs>
+              <Grid>
                 <Link
                   component={RouterLink}
                   to="/forgot-password"
@@ -174,7 +174,7 @@ const LoginPage = () => {
                   Forgot password?
                 </Link>
               </Grid>
-              <Grid item>
+              <Grid>
                 <Link component={RouterLink} to="/register" variant="body2">
                   {"Don't have an account? Sign Up"}
                 </Link>

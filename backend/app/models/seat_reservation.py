@@ -14,6 +14,8 @@ class SeatReservation(Base):
     booking_id = Column(UUID(as_uuid=True), ForeignKey("bookings.id"), nullable=False)
     showing_id = Column(UUID(as_uuid=True), ForeignKey("showings.id"), nullable=False)
     seat_id = Column(UUID(as_uuid=True), ForeignKey("seats.id"), nullable=False)
+    row = Column(String, nullable=False)  # Row identifier (A, B, C, etc.)
+    number = Column(Integer, nullable=False)  # Seat number in the row
     price = Column(Float, nullable=False)
     status = Column(
         Enum("available", "selected", "reserved", "booked", name="seat_status"),
