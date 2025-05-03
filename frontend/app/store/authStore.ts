@@ -59,20 +59,23 @@ export const useAuthStore = create<AuthState>()(
           });
 
           const { access_token } = response.data;
-          const decoded = jwtDecode<JwtPayload>(access_token);
-
-          const user: User = {
-            id: decoded.sub,
-            email: decoded.email,
-            name: decoded.name,
-            avatar: decoded.avatar,
-            role: decoded.role,
-          };
 
           // Set auth header for future requests
           axios.defaults.headers.common[
             "Authorization"
           ] = `Bearer ${access_token}`;
+
+          // Fetch user details
+          const userResponse = await axios.get(`${API_URL}/api/v1/auth/me`);
+          const userData = userResponse.data;
+
+          const user: User = {
+            id: userData.id,
+            email: userData.email,
+            name: userData.name,
+            avatar: userData.avatar,
+            role: userData.role,
+          };
 
           set({
             isAuthenticated: true,
@@ -104,20 +107,23 @@ export const useAuthStore = create<AuthState>()(
           });
 
           const { access_token } = response.data;
-          const decoded = jwtDecode<JwtPayload>(access_token);
-
-          const user: User = {
-            id: decoded.sub,
-            email: decoded.email,
-            name: decoded.name,
-            avatar: decoded.avatar,
-            role: decoded.role,
-          };
 
           // Set auth header for future requests
           axios.defaults.headers.common[
             "Authorization"
           ] = `Bearer ${access_token}`;
+
+          // Fetch user details
+          const userResponse = await axios.get(`${API_URL}/api/v1/auth/me`);
+          const userData = userResponse.data;
+
+          const user: User = {
+            id: userData.id,
+            email: userData.email,
+            name: userData.name,
+            avatar: userData.avatar,
+            role: userData.role,
+          };
 
           set({
             isAuthenticated: true,
@@ -170,15 +176,16 @@ export const useAuthStore = create<AuthState>()(
           // Set auth header for future requests
           axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
-          // Verify token with backend
-          await axios.get(`${API_URL}/api/v1/auth/me`);
+          // Verify token with backend and get user details
+          const response = await axios.get(`${API_URL}/api/v1/auth/me`);
+          const userData = response.data;
 
           const user: User = {
-            id: decoded.sub,
-            email: decoded.email,
-            name: decoded.name,
-            avatar: decoded.avatar,
-            role: decoded.role,
+            id: userData.id,
+            email: userData.email,
+            name: userData.name,
+            avatar: userData.avatar,
+            role: userData.role,
           };
 
           set({
@@ -200,6 +207,9 @@ export const useAuthStore = create<AuthState>()(
       name: "auth-storage",
       partialize: (state) => ({
         token: state.token,
+        user: state.user,
+        isAuthenticated: state.isAuthenticated,
+        isAdmin: state.isAdmin,
       }),
     }
   )

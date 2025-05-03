@@ -82,7 +82,7 @@ const AdminUserList = () => {
 
         // API URL from environment variables or fallback
         const API_URL =
-        (import.meta as any).env?.VITE_API_URL || "http://localhost:8000";
+          (import.meta as any).env?.VITE_API_URL || "http://localhost:8000";
 
         const response = await fetch(
           `${API_URL}/api/v1/admin/users?q=${searchQuery}`,
@@ -180,7 +180,8 @@ const AdminUserList = () => {
   const handleDeleteUser = async (userId: string) => {
     try {
       // API URL from environment variables or fallback
-      const API_URL = (import.meta as any).env?.VITE_API_URL || "http://localhost:8000";
+      const API_URL =
+        (import.meta as any).env?.VITE_API_URL || "http://localhost:8000";
 
       const response = await fetch(`${API_URL}/api/v1/admin/users/${userId}`, {
         method: "DELETE",
@@ -205,7 +206,8 @@ const AdminUserList = () => {
   ) => {
     try {
       // API URL from environment variables or fallback
-      const API_URL = (import.meta as any).env?.VITE_API_URL || "http://localhost:8000";
+      const API_URL =
+        (import.meta as any).env?.VITE_API_URL || "http://localhost:8000";
 
       const newStatus = currentStatus === "active" ? "inactive" : "active";
 
@@ -244,7 +246,7 @@ const AdminUserList = () => {
 
   // Get user initials for avatar
   const getUserInitials = (firstName: string, lastName: string) => {
-    return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
+    return `${firstName?.charAt(0)}${lastName?.charAt(0)}`.toUpperCase();
   };
 
   // Get avatar background color based on user id (for consistency)
@@ -463,7 +465,7 @@ const AdminUserList = () => {
         <form onSubmit={handleSaveUser}>
           <DialogContent>
             <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
+              <Grid>
                 <TextField
                   label="First Name"
                   name="firstName"
@@ -473,7 +475,7 @@ const AdminUserList = () => {
                   onChange={handleFormChange}
                 />
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid>
                 <TextField
                   label="Last Name"
                   name="lastName"
@@ -483,7 +485,7 @@ const AdminUserList = () => {
                   onChange={handleFormChange}
                 />
               </Grid>
-              <Grid item xs={12}>
+              <Grid>
                 <TextField
                   label="Email"
                   name="email"
@@ -495,7 +497,7 @@ const AdminUserList = () => {
                 />
               </Grid>
               {!selectedUser && (
-                <Grid item xs={12}>
+                <Grid>
                   <TextField
                     label="Password"
                     name="password"
@@ -510,7 +512,7 @@ const AdminUserList = () => {
                   />
                 </Grid>
               )}
-              <Grid item xs={12} sm={6}>
+              <Grid>
                 <FormControl fullWidth required>
                   <InputLabel id="role-select-label">Role</InputLabel>
                   <Select
@@ -532,7 +534,7 @@ const AdminUserList = () => {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid>
                 <FormControl fullWidth required>
                   <InputLabel id="status-select-label">Status</InputLabel>
                   <Select

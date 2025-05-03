@@ -101,7 +101,7 @@ const AdminMovieList = () => {
 
         // API URL from environment variables or fallback
         const API_URL =
-        (import.meta as any).env?.VITE_API_URL || "http://localhost:8000";
+          (import.meta as any).env?.VITE_API_URL || "http://localhost:8000";
 
         const response = await fetch(
           `${API_URL}/api/v1/admin/movies?q=${searchQuery}`,
@@ -218,7 +218,8 @@ const AdminMovieList = () => {
   const handleDeleteMovie = async (movieId: number) => {
     try {
       // API URL from environment variables or fallback
-      const API_URL = (import.meta as any).env?.VITE_API_URL || "http://localhost:8000";
+      const API_URL =
+        (import.meta as any).env?.VITE_API_URL || "http://localhost:8000";
 
       const response = await fetch(
         `${API_URL}/api/v1/admin/movies/${movieId}`,
@@ -268,7 +269,8 @@ const AdminMovieList = () => {
       setError(null);
 
       // API URL from environment variables or fallback
-      const API_URL = (import.meta as any).env?.VITE_API_URL || "http://localhost:8000";
+      const API_URL =
+        (import.meta as any).env?.VITE_API_URL || "http://localhost:8000";
 
       const response = await fetch(
         `${API_URL}/api/v1/admin/tmdb/search?query=${encodeURIComponent(
@@ -301,7 +303,8 @@ const AdminMovieList = () => {
       setError(null);
 
       // API URL from environment variables or fallback
-      const API_URL = (import.meta as any).env?.VITE_API_URL || "http://localhost:8000";
+      const API_URL =
+        (import.meta as any).env?.VITE_API_URL || "http://localhost:8000";
 
       const response = await fetch(
         `${API_URL}/api/v1/admin/tmdb/import/${tmdbId}`,
@@ -584,7 +587,7 @@ const AdminMovieList = () => {
           <DialogContent>
             <Grid container spacing={3}>
               {/* Poster Preview */}
-              <Grid item xs={12} sm={4}>
+              <Grid>
                 <Box
                   sx={{
                     display: "flex",
@@ -636,9 +639,9 @@ const AdminMovieList = () => {
               </Grid>
 
               {/* Movie Details */}
-              <Grid item xs={12} sm={8}>
+              <Grid>
                 <Grid container spacing={2}>
-                  <Grid item xs={12}>
+                  <Grid>
                     <TextField
                       label="Title"
                       name="title"
@@ -649,7 +652,7 @@ const AdminMovieList = () => {
                     />
                   </Grid>
 
-                  <Grid item xs={12} sm={6}>
+                  <Grid>
                     <TextField
                       label="Release Date"
                       name="release_date"
@@ -662,7 +665,7 @@ const AdminMovieList = () => {
                     />
                   </Grid>
 
-                  <Grid item xs={12} sm={6}>
+                  <Grid>
                     <TextField
                       label="Runtime (minutes)"
                       name="runtime"
@@ -675,7 +678,7 @@ const AdminMovieList = () => {
                     />
                   </Grid>
 
-                  <Grid item xs={12}>
+                  <Grid>
                     <FormControl fullWidth>
                       <InputLabel id="genres-label">Genres</InputLabel>
                       <Select
@@ -721,7 +724,7 @@ const AdminMovieList = () => {
                     </FormControl>
                   </Grid>
 
-                  <Grid item xs={12} sm={6}>
+                  <Grid>
                     <TextField
                       label="Director"
                       name="director"
@@ -731,7 +734,7 @@ const AdminMovieList = () => {
                     />
                   </Grid>
 
-                  <Grid item xs={12} sm={6}>
+                  <Grid>
                     <TextField
                       label="Average Rating (0-10)"
                       name="vote_average"
@@ -743,7 +746,7 @@ const AdminMovieList = () => {
                     />
                   </Grid>
 
-                  <Grid item xs={12}>
+                  <Grid>
                     <TextField
                       label="Cast (comma separated)"
                       name="cast"
@@ -754,7 +757,7 @@ const AdminMovieList = () => {
                     />
                   </Grid>
 
-                  <Grid item xs={12}>
+                  <Grid>
                     <TextField
                       label="Trailer URL"
                       name="trailer_url"
@@ -765,7 +768,7 @@ const AdminMovieList = () => {
                     />
                   </Grid>
 
-                  <Grid item xs={12}>
+                  <Grid>
                     <TextField
                       label="Backdrop Path"
                       name="backdrop_path"
@@ -779,7 +782,7 @@ const AdminMovieList = () => {
               </Grid>
 
               {/* Overview */}
-              <Grid item xs={12}>
+              <Grid>
                 <TextField
                   label="Overview"
                   name="overview"
@@ -840,7 +843,7 @@ const AdminMovieList = () => {
           ) : tmdbSearchResults.length > 0 ? (
             <Grid container spacing={2}>
               {tmdbSearchResults.map((movie) => (
-                <Grid item xs={12} sm={6} md={4} key={movie.id}>
+                <Grid key={movie.id}>
                   <Card sx={{ height: "100%" }}>
                     <CardMedia
                       component="img"

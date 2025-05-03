@@ -163,7 +163,7 @@ const AdminDashboardHome = () => {
       {/* Stats Cards */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
         {statCards.map((card) => (
-          <Grid item xs={12} sm={6} md={3} key={card.title}>
+          <Grid key={card.title}>
             <Card
               sx={{
                 height: "100%",
@@ -200,14 +200,14 @@ const AdminDashboardHome = () => {
 
       {/* Revenue Card */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid item xs={12}>
+        <Grid>
           <Card>
             <CardContent>
               <Typography variant="h6" gutterBottom>
                 Total Revenue
               </Typography>
               <Typography variant="h3" component="div" color="primary">
-                ${stats.revenue.toLocaleString()}
+                ${stats.revenue?.toLocaleString()}
               </Typography>
             </CardContent>
           </Card>

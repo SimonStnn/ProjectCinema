@@ -29,7 +29,7 @@ import {
 import {
   Search as SearchIcon,
   Refresh as RefreshIcon,
-//   EventNote as EventNoteIcon,
+  //   EventNote as EventNoteIcon,
   Delete as DeleteIcon,
   Edit as EditIcon,
   Receipt as ReceiptIcon,
@@ -383,47 +383,47 @@ const AdminBookingList = () => {
         <DialogContent dividers>
           {selectedBooking && (
             <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
+              <Grid>
                 <Typography variant="subtitle2">Booking ID</Typography>
                 <Typography variant="body1">{selectedBooking.id}</Typography>
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid>
                 <Typography variant="subtitle2">Date</Typography>
                 <Typography variant="body1">
                   {formatDate(selectedBooking.booking_date)}
                 </Typography>
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid>
                 <Typography variant="subtitle2">User</Typography>
                 <Typography variant="body1">
                   {selectedBooking.user_name}
                 </Typography>
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid>
                 <Typography variant="subtitle2">Movie</Typography>
                 <Typography variant="body1">
                   {selectedBooking.movie_title}
                 </Typography>
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid>
                 <Typography variant="subtitle2">Cinema</Typography>
                 <Typography variant="body1">
                   {selectedBooking.cinema_name}
                 </Typography>
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid>
                 <Typography variant="subtitle2">Room</Typography>
                 <Typography variant="body1">
                   {selectedBooking.room_name}
                 </Typography>
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid>
                 <Typography variant="subtitle2">Showing Time</Typography>
                 <Typography variant="body1">
                   {formatDate(selectedBooking.showing_time)}
                 </Typography>
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid>
                 <Typography variant="subtitle2">Status</Typography>
                 <Chip
                   label={selectedBooking.status}
@@ -437,26 +437,26 @@ const AdminBookingList = () => {
                   size="small"
                 />
               </Grid>
-              <Grid item xs={12}>
+              <Grid>
                 <Typography variant="subtitle2">Seats</Typography>
                 <Typography variant="body1">
                   {selectedBooking.seats.join(", ")}
                 </Typography>
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid>
                 <Typography variant="subtitle2">Total Price</Typography>
                 <Typography variant="body1">
                   ${selectedBooking.total_price.toFixed(2)}
                 </Typography>
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid>
                 <Typography variant="subtitle2">Payment Method</Typography>
                 <Typography variant="body1">
                   {selectedBooking.payment_method}
                 </Typography>
               </Grid>
               {selectedBooking.payment_id && (
-                <Grid item xs={12}>
+                <Grid>
                   <Typography variant="subtitle2">Payment ID</Typography>
                   <Typography variant="body1">
                     {selectedBooking.payment_id}
@@ -493,7 +493,7 @@ const AdminBookingList = () => {
         <form onSubmit={handleSaveBooking}>
           <DialogContent dividers>
             <Grid container spacing={2}>
-              <Grid item xs={12}>
+              <Grid>
                 <FormControl fullWidth required>
                   <InputLabel id="status-select-label">Status</InputLabel>
                   <Select

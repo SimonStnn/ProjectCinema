@@ -5,7 +5,7 @@ import {
   Button,
   CircularProgress,
   Alert,
-//   Paper,
+  //   Paper,
   Grid,
   TextField,
   Switch,
@@ -249,7 +249,7 @@ const AdminSettings = () => {
       ) : (
         <Grid container spacing={3}>
           {/* TMDB API Settings */}
-          <Grid item xs={12} md={6}>
+          <Grid>
             <Card elevation={2}>
               <CardHeader
                 title="TMDB API Settings"
@@ -258,7 +258,7 @@ const AdminSettings = () => {
               <Divider />
               <CardContent>
                 <Grid container spacing={2}>
-                  <Grid item xs={12}>
+                  <Grid>
                     <TextField
                       name="tmdb_api_key"
                       label="TMDB API Key"
@@ -269,7 +269,7 @@ const AdminSettings = () => {
                       type="password"
                     />
                   </Grid>
-                  <Grid item xs={12}>
+                  <Grid>
                     <TextField
                       name="tmdb_api_url"
                       label="TMDB API URL"
@@ -279,7 +279,7 @@ const AdminSettings = () => {
                       required
                     />
                   </Grid>
-                  <Grid item xs={12}>
+                  <Grid>
                     <Button
                       variant="outlined"
                       startIcon={<ApiIcon />}
@@ -294,7 +294,7 @@ const AdminSettings = () => {
           </Grid>
 
           {/* MQTT Settings */}
-          <Grid item xs={12} md={6}>
+          <Grid>
             <Card elevation={2}>
               <CardHeader
                 title="Real-time Communication"
@@ -303,7 +303,7 @@ const AdminSettings = () => {
               <Divider />
               <CardContent>
                 <Grid container spacing={2}>
-                  <Grid item xs={12}>
+                  <Grid>
                     <FormControlLabel
                       control={
                         <Switch
@@ -316,7 +316,7 @@ const AdminSettings = () => {
                       label="Enable Real-time Updates (MQTT)"
                     />
                   </Grid>
-                  <Grid item xs={12}>
+                  <Grid>
                     <TextField
                       name="mqtt_broker_url"
                       label="MQTT Broker URL"
@@ -326,7 +326,7 @@ const AdminSettings = () => {
                       disabled={!settings.enable_mqtt}
                     />
                   </Grid>
-                  <Grid item xs={12} sm={6}>
+                  <Grid>
                     <TextField
                       name="mqtt_websocket_port"
                       label="WebSocket Port"
@@ -337,7 +337,7 @@ const AdminSettings = () => {
                       disabled={!settings.enable_mqtt}
                     />
                   </Grid>
-                  <Grid item xs={12} sm={6}>
+                  <Grid>
                     <TextField
                       name="mqtt_topic_prefix"
                       label="Topic Prefix"
@@ -353,7 +353,7 @@ const AdminSettings = () => {
           </Grid>
 
           {/* Booking Settings */}
-          <Grid item xs={12} md={6}>
+          <Grid>
             <Card elevation={2}>
               <CardHeader
                 title="Booking Settings"
@@ -362,7 +362,7 @@ const AdminSettings = () => {
               <Divider />
               <CardContent>
                 <Grid container spacing={2}>
-                  <Grid item xs={12} sm={6}>
+                  <Grid>
                     <TextField
                       name="booking_expiration_minutes"
                       label="Booking Expiration (minutes)"
@@ -373,7 +373,7 @@ const AdminSettings = () => {
                       InputProps={{ inputProps: { min: 1 } }}
                     />
                   </Grid>
-                  <Grid item xs={12} sm={6}>
+                  <Grid>
                     <TextField
                       name="seat_hold_timeout_seconds"
                       label="Seat Hold Timeout (seconds)"
@@ -384,7 +384,7 @@ const AdminSettings = () => {
                       InputProps={{ inputProps: { min: 30 } }}
                     />
                   </Grid>
-                  <Grid item xs={12} sm={6}>
+                  <Grid>
                     <TextField
                       name="max_seats_per_booking"
                       label="Max Seats Per Booking"
@@ -395,7 +395,7 @@ const AdminSettings = () => {
                       InputProps={{ inputProps: { min: 1, max: 20 } }}
                     />
                   </Grid>
-                  <Grid item xs={12} sm={6}>
+                  <Grid>
                     <TextField
                       name="default_currency"
                       label="Default Currency"
@@ -410,7 +410,7 @@ const AdminSettings = () => {
           </Grid>
 
           {/* Payment Settings */}
-          <Grid item xs={12} md={6}>
+          <Grid>
             <Card elevation={2}>
               <CardHeader
                 title="Payment Settings"
@@ -419,7 +419,7 @@ const AdminSettings = () => {
               <Divider />
               <CardContent>
                 <Grid container spacing={2}>
-                  <Grid item xs={12}>
+                  <Grid>
                     <FormControl fullWidth>
                       <InputLabel id="payment-gateway-label">
                         Payment Gateway
@@ -443,7 +443,7 @@ const AdminSettings = () => {
           </Grid>
 
           {/* System Settings */}
-          <Grid item xs={12}>
+          <Grid>
             <Card elevation={2}>
               <CardHeader
                 title="System Settings"
@@ -452,7 +452,7 @@ const AdminSettings = () => {
               <Divider />
               <CardContent>
                 <Grid container spacing={2}>
-                  <Grid item xs={12} sm={6}>
+                  <Grid>
                     <FormControlLabel
                       control={
                         <Switch
@@ -465,7 +465,7 @@ const AdminSettings = () => {
                       label="Maintenance Mode"
                     />
                   </Grid>
-                  <Grid item xs={12} sm={6}>
+                  <Grid>
                     <FormControlLabel
                       control={
                         <Switch
@@ -478,7 +478,7 @@ const AdminSettings = () => {
                       label="Enable Analytics"
                     />
                   </Grid>
-                  <Grid item xs={12}>
+                  <Grid>
                     <TextField
                       name="sentry_dsn"
                       label="Sentry DSN (Error Tracking)"

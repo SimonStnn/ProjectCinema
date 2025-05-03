@@ -481,7 +481,7 @@ const AdminShowingList = () => {
         <form onSubmit={handleSaveShowing}>
           <DialogContent>
             <Grid container spacing={3}>
-              <Grid item xs={12}>
+              <Grid>
                 <FormControl fullWidth required>
                   <InputLabel id="movie-select-label">Movie</InputLabel>
                   <Select
@@ -508,7 +508,7 @@ const AdminShowingList = () => {
                 </FormControl>
               </Grid>
 
-              <Grid item xs={12} sm={6}>
+              <Grid>
                 <FormControl fullWidth required>
                   <InputLabel id="cinema-select-label">Cinema</InputLabel>
                   <Select
@@ -535,7 +535,7 @@ const AdminShowingList = () => {
                 </FormControl>
               </Grid>
 
-              <Grid item xs={12} sm={6}>
+              <Grid>
                 <FormControl fullWidth required disabled={!formData.cinemaId}>
                   <InputLabel id="room-select-label">Room</InputLabel>
                   <Select
@@ -562,7 +562,7 @@ const AdminShowingList = () => {
                 </FormControl>
               </Grid>
 
-              <Grid item xs={12} sm={6}>
+              <Grid>
                 <TextField
                   label="Start Time"
                   type="datetime-local"
@@ -575,7 +575,7 @@ const AdminShowingList = () => {
                 />
               </Grid>
 
-              <Grid item xs={12} sm={6}>
+              <Grid>
                 <TextField
                   label="Price ($)"
                   type="number"
@@ -588,7 +588,7 @@ const AdminShowingList = () => {
                 />
               </Grid>
 
-              <Grid item xs={12}>
+              <Grid>
                 <FormControl fullWidth>
                   <InputLabel id="status-select-label">Status</InputLabel>
                   <Select

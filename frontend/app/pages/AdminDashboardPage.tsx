@@ -102,22 +102,18 @@ const AdminDashboardPage = () => {
       <List>
         {menuItems.map((item) => (
           <ListItem
-            button
             key={item.text}
             component={RouterLink}
             to={`/admin${item.path}`}
-            selected={isActive(item.path)}
             onClick={() => setMobileOpen(false)}
             sx={{
-              "&.Mui-selected": {
-                backgroundColor: "primary.main",
-                color: "primary.contrastText",
-                "& .MuiListItemIcon-root": {
-                  color: "primary.contrastText",
-                },
-                "&:hover": {
-                  backgroundColor: "primary.dark",
-                },
+              backgroundColor: isActive(item.path) ? "primary.main" : "inherit",
+              color: isActive(item.path) ? "primary.contrastText" : "inherit",
+              "& .MuiListItemIcon-root": {
+                color: isActive(item.path) ? "primary.contrastText" : "inherit",
+              },
+              "&:hover": {
+                backgroundColor: isActive(item.path) ? "primary.dark" : "inherit",
               },
             }}
           >
@@ -134,7 +130,7 @@ const AdminDashboardPage = () => {
       </List>
       <Divider />
       <List>
-        <ListItem button onClick={handleLogout}>
+        <ListItem onClick={handleLogout}>
           <ListItemIcon>
             <LogoutIcon />
           </ListItemIcon>

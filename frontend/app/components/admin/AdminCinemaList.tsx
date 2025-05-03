@@ -149,7 +149,7 @@ const CinemaSettings = () => {
         ) : (
           <form onSubmit={handleSubmit}>
             <Grid container spacing={3}>
-              <Grid item xs={12}>
+              <Grid>
                 <TextField
                   name="name"
                   label="Cinema Name"
@@ -159,7 +159,7 @@ const CinemaSettings = () => {
                   onChange={handleInputChange}
                 />
               </Grid>
-              <Grid item xs={12}>
+              <Grid>
                 <TextField
                   name="description"
                   label="Description"
@@ -170,7 +170,7 @@ const CinemaSettings = () => {
                   onChange={handleInputChange}
                 />
               </Grid>
-              <Grid item xs={12}>
+              <Grid>
                 <TextField
                   name="address"
                   label="Address"
@@ -180,7 +180,7 @@ const CinemaSettings = () => {
                   onChange={handleInputChange}
                 />
               </Grid>
-              <Grid item xs={12} sm={4}>
+              <Grid>
                 <TextField
                   name="city"
                   label="City"
@@ -190,7 +190,7 @@ const CinemaSettings = () => {
                   onChange={handleInputChange}
                 />
               </Grid>
-              <Grid item xs={12} sm={4}>
+              <Grid>
                 <TextField
                   name="state"
                   label="State/Province"
@@ -199,7 +199,7 @@ const CinemaSettings = () => {
                   onChange={handleInputChange}
                 />
               </Grid>
-              <Grid item xs={12} sm={4}>
+              <Grid>
                 <TextField
                   name="postal_code"
                   label="Postal Code"
@@ -208,7 +208,7 @@ const CinemaSettings = () => {
                   onChange={handleInputChange}
                 />
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid>
                 <TextField
                   name="phone"
                   label="Phone"
@@ -217,7 +217,7 @@ const CinemaSettings = () => {
                   onChange={handleInputChange}
                 />
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid>
                 <TextField
                   name="email"
                   label="Email"
@@ -227,7 +227,7 @@ const CinemaSettings = () => {
                   onChange={handleInputChange}
                 />
               </Grid>
-              <Grid item xs={12}>
+              <Grid>
                 <Box
                   sx={{ display: "flex", justifyContent: "flex-end", gap: 2 }}
                 >
