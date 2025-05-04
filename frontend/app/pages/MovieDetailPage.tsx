@@ -356,7 +356,7 @@ const MovieDetailPage = () => {
 
                 <Grid container spacing={3}>
                   {showingsByDate[selectedDate]?.map((showing) => (
-                    <Grid item key={showing.id} xs={12} sm={6} md={4} lg={3}>
+                    <Grid key={showing.id}>
                       <Card
                         sx={{
                           height: "100%",

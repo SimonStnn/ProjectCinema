@@ -601,3 +601,51 @@ async def update_admin_settings(
         "message": "Settings updated successfully",
         "updated_at": datetime.now().isoformat(),
     }
+
+
+@router.get("/cinemas", response_model=List[dict])
+async def get_admin_cinemas(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_admin_user),
+) -> Any:
+    """
+    Get cinema information for admin dashboard
+    Since we only have one cinema, this returns a list with a single item for consistency
+    """
+    # Return static information about the single cinema in list format for frontend compatibility
+    return [
+        {
+            "id": "1",  # Using a fixed ID since there's only one cinema
+            "name": "Grand Cinema",
+            "address": "123 Main Street",
+            "city": "Movie City",
+            "description": "The best cinema experience in town",
+            "phone": "555-123-4567",
+            "email": "info@grandcinema.com",
+        }
+    ]
+
+
+@router.get("/cinemas/{cinema_id}/rooms", response_model=List[dict])
+async def get_admin_cinema_rooms(
+    cinema_id: str,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_admin_user),
+) -> Any:
+    """
+    Get rooms for a specific cinema (admin only)
+    """
+    # Fetch all rooms since there's only one cinema
+    query = select(Room)
+    result = await db.execute(query)
+    rooms = result.scalars().all()
+
+    return [
+        {
+            "id": str(room.id),
+            "name": room.name,
+            "cinema_id": cinema_id,  # Use the provided cinema_id for consistency
+            "seat_count": room.capacity,
+        }
+        for room in rooms
+    ]

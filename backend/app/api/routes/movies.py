@@ -26,33 +26,23 @@ router = APIRouter(prefix="/movies", tags=["movies"])
 
 @router.get("/", response_model=List[MovieSchema])
 async def get_movies(
-    db: AsyncSession = Depends(get_db),
     skip: int = 0,
     limit: int = 100,
     search: Optional[str] = None,
+    sort_by: str = "popularity.desc",
+    page: int = 1,
 ) -> Any:
     """
-    Get list of movies in the database
+    Get list of movies in the tmdb
     """
-    query = select(Movie)
-
-    # Apply search filter if provided
-    if search:
-        query = query.filter(
-            or_(
-                Movie.title.ilike(f"%{search}%"),
-                Movie.genres.any(search, operator="@>"),
-            )
+    collection = tmdb.Movies()
+    movies = collection.popular(page=page, sort_by=sort_by)
+    if not movies["results"]:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No movies found",
         )
-
-    # Apply pagination
-    query = query.offset(skip).limit(limit)
-
-    # Execute query
-    result = await db.execute(query)
-    movies = result.scalars().all()
-
-    return movies
+    return movies["results"]
 
 
 @router.get("/now_playing", response_model=List[TMDBMovie])

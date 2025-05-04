@@ -159,7 +159,7 @@ const AdminShowingList = () => {
           (import.meta as any).env?.VITE_API_URL || "http://localhost:8000";
 
         const response = await fetch(
-          `${API_URL}/api/v1/admin/cinemas/${cinemaId}/rooms`,
+          `${API_URL}/api/v1/cinema/rooms`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
