@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import axios from "axios";
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 
 interface User {
   id: string;
@@ -36,7 +36,9 @@ interface AuthState {
 }
 
 // Import environment variables explicitly
-const API_URL = (import.meta as any).env?.VITE_API_URL || "http://localhost:8000";
+const API_URL =
+  (import.meta as any).env?.VITE_API_URL || "http://localhost:8000";
+const API_VERSION = "/api/v1"; // Add API version to match backend configuration
 
 export const useAuthStore = create<AuthState>()(
   persist(
@@ -52,10 +54,13 @@ export const useAuthStore = create<AuthState>()(
         try {
           set({ loading: true, error: null });
 
-          const response = await axios.post(`${API_URL}/api/auth/login`, {
-            email,
-            password,
-          });
+          const response = await axios.post(
+            `${API_URL}${API_VERSION}/auth/login`,
+            {
+              email,
+              password,
+            }
+          );
 
           const { access_token } = response.data;
           const decoded = jwtDecode<JwtPayload>(access_token);
@@ -96,11 +101,14 @@ export const useAuthStore = create<AuthState>()(
         try {
           set({ loading: true, error: null });
 
-          const response = await axios.post(`${API_URL}/api/auth/register`, {
-            name,
-            email,
-            password,
-          });
+          const response = await axios.post(
+            `${API_URL}${API_VERSION}/auth/register`,
+            {
+              name,
+              email,
+              password,
+            }
+          );
 
           const { access_token } = response.data;
           const decoded = jwtDecode<JwtPayload>(access_token);
@@ -170,7 +178,7 @@ export const useAuthStore = create<AuthState>()(
           axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
           // Verify token with backend
-          await axios.get(`${API_URL}/api/auth/me`);
+          await axios.get(`${API_URL}${API_VERSION}/auth/me`);
 
           const user: User = {
             id: decoded.sub,
