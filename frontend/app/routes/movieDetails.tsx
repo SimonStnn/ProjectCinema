@@ -228,7 +228,7 @@ const MovieDetailPage = () => {
           <div className="text-white">
             <h1 className="text-4xl font-bold mb-2">{movie.title}</h1>
 
-            <div className="flex items-center mb-2">
+            <div className="flex items-center mb-2" title="Rating">
               <Rating value={movie.vote_average / 2} precision={0.5} readOnly />
               <p className="ml-2 text-sm">
                 {(movie.vote_average / 2).toFixed(1)} ({movie.vote_count}{" "}
@@ -244,19 +244,19 @@ const MovieDetailPage = () => {
               ))}
             </div>
 
-            <div className="flex flex-wrap gap-3 mb-2 [&>div]:flex [&>div]:items-center [&>div]:gap-1">
-              <Box>
+            <div className="flex flex-wrap gap-3 mb-2">
+              <div className="flex items-center gap-1" title="Release Date">
                 <CalendarMonth />
                 <p>{new Date(movie.release_date).toDateString()}</p>
-              </Box>
-              <Box>
+              </div>
+              <div className="flex items-center gap-1" title="Runtime">
                 <TimeIcon />
                 <p>{formatRuntime(movie.runtime)}</p>
-              </Box>
+              </div>
             </div>
 
             <h3 className="text-2xl font-bold mb-2">Overview</h3>
-            <p>{movie.overview}</p>
+            <p className=" md:w-8/12">{movie.overview}</p>
           </div>
         </div>
       </div>

@@ -122,12 +122,13 @@ export default function Home() {
       <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
         {loading && getLoadingSkeleton(12)}
         {upcomingMovies.map((movie) => (
-          <MovieCard
-            key={movie.id}
-            movie={movie}
-            className="w-full cursor-pointer hover:scale-105 hover:-translate-y-3 transition-transform duration-200"
-            onClick={() => {}}
-          />
+          <Link to={`/movies/${movie.id}`}>
+            <MovieCard
+              movie={movie}
+              className="w-full hover:scale-105 hover:-translate-y-3 transition-transform duration-200"
+              onClick={() => {}}
+            />
+          </Link>
         ))}
       </div>
     </div>

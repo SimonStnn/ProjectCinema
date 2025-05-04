@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router";
+import { useNavigate, useLocation, Link } from "react-router";
 import { Search as SearchIcon } from "@mui/icons-material";
 import {
   Select,
@@ -216,11 +216,13 @@ const MovieListPage = () => {
         <>
           <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
             {movies.map((movie) => (
-              <MovieCard
-                key={movie.id}
-                movie={movie}
-                onClick={() => handleMovieClick(movie.id)}
-              />
+              <Link to={`/movies/${movie.id}`}>
+                <MovieCard
+                  movie={movie}
+                  className="w-full hover:scale-105 hover:-translate-y-3 transition-transform duration-200"
+                  onClick={() => {}}
+                />
+              </Link>
             ))}
           </div>
 
