@@ -41,8 +41,6 @@ export default function Home() {
         setLoading(true);
         setError(null);
 
-        await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate loading delay
-
         // API URL from environment variables or fallback
         const API_URL =
           (import.meta as any).env?.VITE_API_URL || "http://localhost:8000";
@@ -77,7 +75,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="w-full container mx-auto">
+    <div className="container mx-auto">
       <AspectRatio
         ratio={16 / 9}
         className="w-full bg-linear-to-br from-sky-600 to-sky-800 rounded-2xl overflow-hidden shadow-lg mt-10"

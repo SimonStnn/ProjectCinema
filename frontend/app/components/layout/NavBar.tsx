@@ -34,8 +34,8 @@ const NavigationBar = () => {
   };
 
   return (
-    <header className="flex items-center justify-between p-4 bg-sky-800 text-white shadow-md">
-      <div className="flex items-center space-x-2">
+    <header className="flex items-center justify-between p-4 bg-sky-800 text-white shadow-md select-none">
+      <Link to="/" className="flex items-center space-x-2">
         <Theaters className="h-full size-3 text-primary" />
         <h1 className="flex flex-col font-mono">
           <span className="pl-0.5 text-sm opacity-80 leading-none">
@@ -45,7 +45,7 @@ const NavigationBar = () => {
             Cinema
           </span>
         </h1>
-      </div>
+      </Link>
       <NavigationMenu>
         <NavigationMenuList>
           <NavigationMenuItem>
@@ -95,7 +95,7 @@ const NavigationBar = () => {
             </>
           )}
         </NavigationMenuList>
-        { isAuthenticated && (
+        {isAuthenticated && (
           <DropdownMenu>
             <DropdownMenuTrigger className="ml-4">
               <Avatar>

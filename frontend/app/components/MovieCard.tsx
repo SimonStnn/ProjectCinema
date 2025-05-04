@@ -2,15 +2,13 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
-  CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 
 import type { ClassValue } from "clsx";
 
 import { cn } from "@/lib/utils";
-import { Box, Rating, Typography } from "@mui/material";
+import { Rating } from "@mui/material";
 
 interface Movie {
   id: number;
@@ -35,18 +33,20 @@ const MovieCard = ({ movie, className, onClick }: MovieCardProps) => {
   // Generate image URL or use placeholder
   const imageUrl = movie.poster_path
     ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
-    : "/placeholder-poster.jpg";
+    : "https://picsum.photos/id/810/200/300";
 
   return (
     <Card className={cn("pt-0 overflow-hidden", className)} onClick={onClick}>
-      <img src={imageUrl} alt={`${movie.title} poster`} />
+      <img
+        src={imageUrl}
+        alt={`${movie.title} poster`}
+        className=" h-[300px]"
+      />
       <CardContent>
         <CardTitle>{movie.title}</CardTitle>
         <CardDescription className="flex items-center">
           <Rating value={rating} precision={0.5} readOnly size="small" />
-          <Typography variant="body2" sx={{ ml: 1 }}>
-            {rating.toFixed(1)}
-          </Typography>
+          <span>{rating.toFixed(1)}</span>
         </CardDescription>
         <p className="line-clamp-3">{movie.overview}</p>
       </CardContent>
