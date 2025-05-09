@@ -1,12 +1,13 @@
 from typing import Any, List, Optional
 from uuid import UUID
+from datetime import datetime
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status, Body
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import joinedload
 
-from app.core.security import get_current_user
+from app.core.security import get_current_user, validate_admin
 from app.db.session import get_db
 from app.models.showing import Showing
 from app.models.room import Room
@@ -160,3 +161,84 @@ async def get_showing_seats(
             )
 
     return seats
+
+
+@router.post("/", status_code=status.HTTP_201_CREATED)
+async def create_showing(
+    movie_id: int = Body(..., description="TMDB Movie ID"),
+    room_id: UUID = Body(..., description="Room ID"),
+    start_time: datetime = Body(..., description="Start time of the showing"),
+    end_time: datetime = Body(..., description="End time of the showing"),
+    price: float = Body(..., description="Ticket price"),
+    showing_status: str = Body("scheduled", description="Status of the showing"),
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> Any:
+    """
+    Create a new showing for a movie
+    Only administrators can create showings
+    """
+    # Check if user is an admin
+    validate_admin(current_user)
+
+    # Verify that the movie exists using tmdb_id instead of id
+    movie_result = await db.execute(select(Movie).filter(Movie.tmdb_id == movie_id))
+    movie = movie_result.scalars().first()
+    if not movie:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Movie not found"
+        )
+
+    # Verify that the room exists
+    room_result = await db.execute(select(Room).filter(Room.id == room_id))
+    room = room_result.scalars().first()
+    if not room:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Room not found"
+        )
+
+    # Check for time conflicts in the same room
+    conflict_query = (
+        select(Showing)
+        .filter(Showing.room_id == room_id)
+        .filter(Showing.status == "scheduled")
+        .filter(
+            # Check for overlapping times
+            ((Showing.start_time <= start_time) & (Showing.end_time > start_time))
+            | ((Showing.start_time < end_time) & (Showing.end_time >= end_time))
+            | ((Showing.start_time >= start_time) & (Showing.end_time <= end_time))
+        )
+    )
+
+    conflict_result = await db.execute(conflict_query)
+    conflicting_showing = conflict_result.scalars().first()
+
+    if conflicting_showing:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="There is a time conflict with another showing in this room",
+        )
+
+    # Create the new showing using the movie's internal ID
+    new_showing = Showing(
+        movie_id=movie.id,  # Use the UUID from the movie object
+        room_id=room_id,
+        start_time=start_time,
+        end_time=end_time,
+        price=price,
+        status=showing_status,
+    )
+
+    db.add(new_showing)
+    await db.commit()
+    await db.refresh(new_showing)
+
+    return {
+        "id": str(new_showing.id),
+        "movie_id": movie_id,  # Return the TMDB ID for frontend consistency
+        "room_id": str(room_id),
+        "start_time": new_showing.start_time.isoformat(),
+        "end_time": new_showing.end_time.isoformat(),
+        "price": float(new_showing.price),
+        "status": showing_status,
+    }

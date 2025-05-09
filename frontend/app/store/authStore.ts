@@ -12,12 +12,8 @@ interface User {
 }
 
 interface JwtPayload {
-  sub: string;
-  email: string;
-  name: string;
-  avatar?: string;
-  role: "user" | "admin";
-  exp: number;
+  sub: string; // User ID
+  exp: number; // Expiration timestamp
 }
 
 interface AuthState {
@@ -63,20 +59,25 @@ export const useAuthStore = create<AuthState>()(
           );
 
           const { access_token } = response.data;
-          const decoded = jwtDecode<JwtPayload>(access_token);
-
-          const user: User = {
-            id: decoded.sub,
-            email: decoded.email,
-            name: decoded.name,
-            avatar: decoded.avatar,
-            role: decoded.role,
-          };
 
           // Set auth header for future requests
           axios.defaults.headers.common[
             "Authorization"
           ] = `Bearer ${access_token}`;
+
+          // Get the user data from the /me endpoint
+          const userResponse = await axios.get(
+            `${API_URL}${API_VERSION}/auth/me`
+          );
+          const userData = userResponse.data;
+
+          const user: User = {
+            id: userData.id,
+            email: userData.email,
+            name: userData.name,
+            avatar: userData.avatar,
+            role: userData.role,
+          };
 
           set({
             isAuthenticated: true,
@@ -111,20 +112,25 @@ export const useAuthStore = create<AuthState>()(
           );
 
           const { access_token } = response.data;
-          const decoded = jwtDecode<JwtPayload>(access_token);
-
-          const user: User = {
-            id: decoded.sub,
-            email: decoded.email,
-            name: decoded.name,
-            avatar: decoded.avatar,
-            role: decoded.role,
-          };
 
           // Set auth header for future requests
           axios.defaults.headers.common[
             "Authorization"
           ] = `Bearer ${access_token}`;
+
+          // Get the user data from the /me endpoint
+          const userResponse = await axios.get(
+            `${API_URL}${API_VERSION}/auth/me`
+          );
+          const userData = userResponse.data;
+
+          const user: User = {
+            id: userData.id,
+            email: userData.email,
+            name: userData.name,
+            avatar: userData.avatar,
+            role: userData.role,
+          };
 
           set({
             isAuthenticated: true,
@@ -177,15 +183,18 @@ export const useAuthStore = create<AuthState>()(
           // Set auth header for future requests
           axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
-          // Verify token with backend
-          await axios.get(`${API_URL}${API_VERSION}/auth/me`);
+          // Fetch current user data
+          const userResponse = await axios.get(
+            `${API_URL}${API_VERSION}/auth/me`
+          );
+          const userData = userResponse.data;
 
           const user: User = {
-            id: decoded.sub,
-            email: decoded.email,
-            name: decoded.name,
-            avatar: decoded.avatar,
-            role: decoded.role,
+            id: userData.id,
+            email: userData.email,
+            name: userData.name,
+            avatar: userData.avatar || undefined,
+            role: userData.role,
           };
 
           set({
@@ -207,6 +216,9 @@ export const useAuthStore = create<AuthState>()(
       name: "auth-storage",
       partialize: (state) => ({
         token: state.token,
+        user: state.user,
+        isAuthenticated: state.isAuthenticated,
+        isAdmin: state.isAdmin,
       }),
     }
   )

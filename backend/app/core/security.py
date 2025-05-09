@@ -98,3 +98,12 @@ async def get_current_admin_user(
             detail="Not enough permissions",
         )
     return current_user
+
+
+def validate_admin(user: User) -> None:
+    """Validate that the user is an admin or raise an exception."""
+    if user.role != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not enough permissions. Admin access required.",
+        )
