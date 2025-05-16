@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy import desc
 
-from app.core.security import get_current_admin_user
+from app.core.security import get_current_manager_user
 from app.db.session import get_db
 from app.models.user import User
 from app.models.movie import Movie
@@ -19,7 +19,9 @@ router = APIRouter(prefix="/admin", tags=["admin"])
 
 
 @router.get("/", response_model=dict)
-async def admin_dashboard(current_user: User = Depends(get_current_admin_user)) -> Any:
+async def admin_dashboard(
+    current_user: User = Depends(get_current_manager_user),
+) -> Any:
     """
     Admin dashboard overview
     """
@@ -29,7 +31,7 @@ async def admin_dashboard(current_user: User = Depends(get_current_admin_user)) 
 @router.get("/users", response_model=List[dict])
 async def get_all_users(
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_admin_user),
+    current_user: User = Depends(get_current_manager_user),
     skip: int = 0,
     limit: int = 100,
 ) -> Any:
@@ -55,7 +57,7 @@ async def get_all_users(
 @router.get("/bookings", response_model=List[dict])
 async def get_all_bookings(
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_admin_user),
+    current_user: User = Depends(get_current_manager_user),
     skip: int = 0,
     limit: int = 100,
 ) -> Any:
@@ -83,7 +85,7 @@ async def get_all_bookings(
 @router.get("/showings", response_model=List[dict])
 async def get_all_showings(
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_admin_user),
+    current_user: User = Depends(get_current_manager_user),
     skip: int = 0,
     limit: int = 100,
 ) -> Any:
@@ -112,7 +114,7 @@ async def get_all_showings(
 async def create_room(
     room_data: dict,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_admin_user),
+    current_user: User = Depends(get_current_manager_user),
 ) -> Any:
     """
     Create a new room in the cinema (admin only)
@@ -125,7 +127,7 @@ async def create_room(
 async def create_showing(
     showing_data: dict,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_admin_user),
+    current_user: User = Depends(get_current_manager_user),
 ) -> Any:
     """
     Create a new showing (admin only)
@@ -137,7 +139,7 @@ async def create_showing(
 @router.get("/dashboard/recent-bookings", response_model=List[dict])
 async def get_recent_bookings(
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_admin_user),
+    current_user: User = Depends(get_current_manager_user),
     limit: int = 10,
 ) -> Any:
     """
@@ -199,7 +201,7 @@ async def get_recent_bookings(
 @router.get("/dashboard/stats", response_model=dict)
 async def get_dashboard_stats(
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_admin_user),
+    current_user: User = Depends(get_current_manager_user),
 ) -> Any:
     """
     Get statistics for the admin dashboard
@@ -275,7 +277,7 @@ async def get_dashboard_stats(
 @router.get("/movies", response_model=List[dict])
 async def get_admin_movies(
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_admin_user),
+    current_user: User = Depends(get_current_manager_user),
     q: str = "",
     skip: int = 0,
     limit: int = 100,
@@ -328,7 +330,7 @@ async def get_admin_movies(
 async def delete_movie(
     movie_id: UUID,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_admin_user),
+    current_user: User = Depends(get_current_manager_user),
 ) -> Any:
     """
     Delete a movie (admin only)
@@ -370,7 +372,7 @@ async def delete_movie(
 async def search_tmdb_movies(
     query: str,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_admin_user),
+    current_user: User = Depends(get_current_manager_user),
 ) -> Any:
     """
     Search for movies in TMDB API
@@ -407,7 +409,7 @@ async def search_tmdb_movies(
 async def import_movie_from_tmdb(
     tmdb_id: int,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_admin_user),
+    current_user: User = Depends(get_current_manager_user),
 ) -> Any:
     """
     Import a movie from TMDB API by its ID
@@ -523,7 +525,7 @@ async def import_movie_from_tmdb(
 @router.get("/settings", response_model=dict)
 async def get_admin_settings(
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_admin_user),
+    current_user: User = Depends(get_current_manager_user),
 ) -> Any:
     """
     Get system settings (admin only)
@@ -571,7 +573,7 @@ async def get_admin_settings(
 async def update_admin_settings(
     settings_data: dict,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_admin_user),
+    current_user: User = Depends(get_current_manager_user),
 ) -> Any:
     """
     Update system settings (admin only)
@@ -606,7 +608,7 @@ async def update_admin_settings(
 @router.get("/cinemas", response_model=List[dict])
 async def get_admin_cinemas(
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_admin_user),
+    current_user: User = Depends(get_current_manager_user),
 ) -> Any:
     """
     Get cinema information for admin dashboard
@@ -630,7 +632,7 @@ async def get_admin_cinemas(
 async def get_admin_cinema_rooms(
     cinema_id: str,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_admin_user),
+    current_user: User = Depends(get_current_manager_user),
 ) -> Any:
     """
     Get rooms for a specific cinema (admin only)

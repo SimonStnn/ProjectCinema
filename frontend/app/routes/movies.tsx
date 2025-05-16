@@ -85,30 +85,27 @@ const MovieListPage = () => {
         const API_URL =
           (import.meta as any).env?.VITE_API_URL || "http://localhost:8000";
 
-        let endpoint;
+        let endpoint = "/movies";
         let queryString = `?page=${page}&sort_by=${sortBy}`;
 
         if (searchQuery) {
-          endpoint = "search";
+          endpoint = "/movies/search";
           queryString += `&query=${encodeURIComponent(searchQuery)}`;
-        } else {
-          endpoint = category;
         }
 
-        const response = await fetch(
-          `${API_URL}/api/v1/movies/${endpoint}${queryString}`
-        );
+        const response = await fetch(`${API_URL}${endpoint}${queryString}`);
 
         if (!response.ok) {
-          throw new Error(`Failed to fetch movies: ${response.statusText}`);
+          throw new Error("Failed to fetch movies");
         }
 
         const data = await response.json();
-        setMovies(data || []);
+        setMovies(data);
         setTotalPages(data.total_pages || 1);
         setLoading(false);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "An error occurred");
+        console.error("Error fetching movies:", err);
+        setError("Failed to load movies. Please try again later.");
         setLoading(false);
       }
     };

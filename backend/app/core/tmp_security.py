@@ -102,10 +102,6 @@ async def get_current_manager_user(
     return current_user
 
 
-# Alias for backward compatibility
-get_current_admin_user = get_current_manager_user
-
-
 def validate_manager(user: User) -> None:
     """Validate that the user is a manager or raise an exception."""
     if user.role != "manager":

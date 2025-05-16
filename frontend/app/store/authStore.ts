@@ -8,12 +8,13 @@ interface User {
   email: string;
   name: string;
   avatar?: string;
-  role: "user" | "admin";
+  role: "user" | "manager";
 }
 
 interface JwtPayload {
   sub: string; // User ID
   exp: number; // Expiration timestamp
+  role: string; // User role
 }
 
 interface AuthState {
@@ -34,7 +35,6 @@ interface AuthState {
 // Import environment variables explicitly
 const API_URL =
   (import.meta as any).env?.VITE_API_URL || "http://localhost:8000";
-const API_VERSION = "/api/v1"; // Add API version to match backend configuration
 
 export const useAuthStore = create<AuthState>()(
   persist(
@@ -50,13 +50,10 @@ export const useAuthStore = create<AuthState>()(
         try {
           set({ loading: true, error: null });
 
-          const response = await axios.post(
-            `${API_URL}${API_VERSION}/auth/login`,
-            {
-              email,
-              password,
-            }
-          );
+          const response = await axios.post(`${API_URL}/auth/login`, {
+            email,
+            password,
+          });
 
           const { access_token } = response.data;
 
@@ -66,9 +63,7 @@ export const useAuthStore = create<AuthState>()(
           ] = `Bearer ${access_token}`;
 
           // Get the user data from the /me endpoint
-          const userResponse = await axios.get(
-            `${API_URL}${API_VERSION}/auth/me`
-          );
+          const userResponse = await axios.get(`${API_URL}/auth/me`);
           const userData = userResponse.data;
 
           const user: User = {
@@ -81,7 +76,7 @@ export const useAuthStore = create<AuthState>()(
 
           set({
             isAuthenticated: true,
-            isAdmin: user.role === "admin",
+            isAdmin: user.role === "manager", // Changed from "admin" to "manager"
             user,
             token: access_token,
             loading: false,
@@ -102,14 +97,11 @@ export const useAuthStore = create<AuthState>()(
         try {
           set({ loading: true, error: null });
 
-          const response = await axios.post(
-            `${API_URL}${API_VERSION}/auth/register`,
-            {
-              name,
-              email,
-              password,
-            }
-          );
+          const response = await axios.post(`${API_URL}/auth/register`, {
+            name,
+            email,
+            password,
+          });
 
           const { access_token } = response.data;
 
@@ -119,9 +111,7 @@ export const useAuthStore = create<AuthState>()(
           ] = `Bearer ${access_token}`;
 
           // Get the user data from the /me endpoint
-          const userResponse = await axios.get(
-            `${API_URL}${API_VERSION}/auth/me`
-          );
+          const userResponse = await axios.get(`${API_URL}/auth/me`);
           const userData = userResponse.data;
 
           const user: User = {
@@ -134,7 +124,7 @@ export const useAuthStore = create<AuthState>()(
 
           set({
             isAuthenticated: true,
-            isAdmin: user.role === "admin",
+            isAdmin: user.role === "manager", // Changed from "admin" to "manager"
             user,
             token: access_token,
             loading: false,
@@ -184,9 +174,7 @@ export const useAuthStore = create<AuthState>()(
           axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
           // Fetch current user data
-          const userResponse = await axios.get(
-            `${API_URL}${API_VERSION}/auth/me`
-          );
+          const userResponse = await axios.get(`${API_URL}/auth/me`);
           const userData = userResponse.data;
 
           const user: User = {
@@ -199,7 +187,7 @@ export const useAuthStore = create<AuthState>()(
 
           set({
             isAuthenticated: true,
-            isAdmin: user.role === "admin",
+            isAdmin: user.role === "manager", // Changed from "admin" to "manager"
             user,
           });
 

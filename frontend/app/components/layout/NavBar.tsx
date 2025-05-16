@@ -94,19 +94,59 @@ const NavigationBar = () => {
               </NavigationMenuItem>
             </>
           )}
+          {isAuthenticated && isAdmin && (
+            <NavigationMenuItem>
+              <Link
+                to="/admin/dashboard"
+                className={cn(
+                  navigationMenuTriggerStyle(),
+                  buttonVariants({
+                    variant: "ghost",
+                  }),
+                  "bg-amber-600 text-white hover:bg-amber-700 hover:text-white"
+                )}
+              >
+                Manager Dashboard
+              </Link>
+            </NavigationMenuItem>
+          )}
         </NavigationMenuList>
         {isAuthenticated && (
           <DropdownMenu>
+            {" "}
             <DropdownMenuTrigger className="ml-4">
               <Avatar>
-                <AvatarImage src="https://github.com/shadcn.png" />
-                <AvatarFallback>CN</AvatarFallback>
+                <AvatarImage src={user?.avatar} />
+                <AvatarFallback>
+                  {user?.name
+                    ?.split(" ")
+                    .map((n) => n[0])
+                    .join("")
+                    .toUpperCase() || "U"}
+                </AvatarFallback>
               </Avatar>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
-              <DropdownMenuItem onClick={handleLogout}>
-                Profile
+              <DropdownMenuLabel>
+                <div className="flex flex-col">
+                  <span>{user?.name}</span>
+                  <span className="text-xs text-muted-foreground">
+                    {user?.email}
+                  </span>
+                </div>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => navigate("/profile")}>
+                My Profile
               </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate("/profile/tickets")}>
+                My Tickets
+              </DropdownMenuItem>
+              {isAdmin && (
+                <DropdownMenuItem onClick={() => navigate("/admin/dashboard")}>
+                  Manager Dashboard
+                </DropdownMenuItem>
+              )}
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
             </DropdownMenuContent>

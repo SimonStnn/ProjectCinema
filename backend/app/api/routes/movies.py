@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy import or_, join
 
-from app.core.security import get_current_user, get_current_admin_user
+from app.core.security import get_current_user, get_current_manager_user
 from app.db.session import get_db
 from app.models.movie import Movie
 from app.models.user import User
@@ -33,7 +33,7 @@ async def get_movies(
     page: int = 1,
 ) -> Any:
     """
-    Get list of movies in the tmdb
+    Get list of movies from TMDB API
     """
     collection = tmdb.Movies()
     movies = collection.popular(page=page, sort_by=sort_by)
@@ -165,7 +165,7 @@ async def get_movie_from_tmdb(
 async def create_movie(
     movie_data: MovieCreate,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_admin_user),
+    current_user: User = Depends(get_current_manager_user),
 ) -> Any:
     """
     Create a new movie (admin only)

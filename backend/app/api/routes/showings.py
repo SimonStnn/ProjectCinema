@@ -33,63 +33,49 @@ async def get_showing(
     Get all showings for a specific movie by its TMDB ID
     """
     # First get the movie from our database using the TMDB ID
-    result = await db.execute(select(Movie).filter(Movie.tmdb_id == movie_id))
-    movie = result.scalars().first()
-
-    if not movie:
-        # Check if movie exists in TMDB
-        try:
-            # Verify movie exists in TMDB
-            collection = tmdb.Movies(movie_id)
-            tmdb_movie = collection.info()
-            if not tmdb_movie:
-                raise HTTPException(
-                    status_code=status.HTTP_404_NOT_FOUND,
-                    detail="Movie not found in TMDB",
-                )
-            # Movie exists in TMDB but not in our database, return empty list
-            return []
-        except Exception as e:
-            # If there's any error with TMDB API, return empty list
-            # This is more user-friendly than returning an error
-            return []
-
-    # Query showings with joined information about rooms
-    query = (
-        select(
-            Showing.id,
-            Showing.movie_id,
-            Showing.start_time,
-            Showing.end_time,
-            Showing.price,
-            Showing.status,
-            Room.id.label("room_id"),
-            Room.name.label("room_name"),
-        )
-        .select_from(Showing)
-        .join(Room, Showing.room_id == Room.id)
-        .filter(Showing.movie_id == movie.id)
-        .filter(Showing.status == "scheduled")
+    """
+    Get all planned screenings
+    """
+    result = await db.execute(
+        select(Showing)
+        .options(joinedload(Showing.movie), joinedload(Showing.room))
+        .order_by(Showing.start_time)
     )
+    showings = result.scalars().all()
 
-    result = await db.execute(query)
-    showings = result.all()
+    screenings_list = []
+    for showing in showings:
+        # Get the movie details from TMDB if available
+        movie_details = None
+        if showing.movie and showing.movie.tmdb_id:
+            try:
+                collection = tmdb.Movies(showing.movie.tmdb_id)
+                movie_details = collection.info()
+            except Exception as e:
+                # If TMDB API fails, continue with local data
+                pass
 
-    # Convert to list of dictionaries
-    showings_list = [
-        {
-            "id": str(showing.id),
-            "movie_id": int(movie_id),  # Use TMDB ID for frontend consistency
-            "room_id": str(showing.room_id),
-            "room_name": showing.room_name,
-            "start_time": showing.start_time.isoformat(),
-            "end_time": showing.end_time.isoformat(),
-            "price": float(showing.price),
-        }
-        for showing in showings
-    ]
+        available_tickets = (
+            showing.room.capacity - showing.bookings_count if showing.room else 0
+        )
 
-    return showings_list
+        screenings_list.append(
+            {
+                "id": str(showing.id),
+                "movie_id": showing.movie.tmdb_id if showing.movie else None,
+                "movie_title": (
+                    showing.movie.title
+                    if showing.movie
+                    else (movie_details.get("title") if movie_details else "Unknown")
+                ),
+                "start_time": showing.start_time.isoformat(),
+                "end_time": showing.end_time.isoformat() if showing.end_time else None,
+                "room": showing.room.name if showing.room else "Unknown",
+                "available_tickets": available_tickets,
+                "price": showing.price,
+            }
+        )
+    return showings
 
 
 @router.get("/seats/{showing_id}", response_model=List[dict])

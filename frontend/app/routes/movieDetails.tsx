@@ -55,11 +55,12 @@ interface Movie {
 interface Showing {
   id: string;
   movie_id: number;
-  room_id: string;
+  movie_title: string;
   start_time: string;
   end_time: string;
   price: number;
-  room_name: string;
+  room: string;
+  available_tickets: number;
 }
 
 interface Room {
@@ -103,7 +104,6 @@ const MovieDetailPage = () => {
   // API URL from environment variables or fallback
   const API_URL =
     (import.meta as any).env?.VITE_API_URL || "http://localhost:8000";
-  const API_VERSION = "/api/v1"; // Match backend configuration
 
   // Group showings by date
   const showingsByDate: ShowingsByDate = {};
@@ -131,14 +131,11 @@ const MovieDetailPage = () => {
     if (isAdmin && showAddForm) {
       const fetchRooms = async () => {
         try {
-          const response = await fetch(
-            `${API_URL}${API_VERSION}/cinema/rooms`,
-            {
-              headers: {
-                Authorization: `Bearer ${useAuthStore.getState().token}`,
-              },
-            }
-          );
+          const response = await fetch(`${API_URL}/rooms`, {
+            headers: {
+              Authorization: `Bearer ${useAuthStore.getState().token}`,
+            },
+          });
 
           if (!response.ok) {
             throw new Error("Failed to fetch rooms");
@@ -162,8 +159,9 @@ const MovieDetailPage = () => {
 
       fetchRooms();
     }
-  }, [isAdmin, showAddForm, API_URL, API_VERSION]);
+  }, [isAdmin, showAddForm, API_URL]);
 
+  // Fetch movie and showings when movie_id changes
   useEffect(() => {
     const fetchMovie = async () => {
       if (!movie_id) return;
@@ -172,33 +170,25 @@ const MovieDetailPage = () => {
         setLoading(true);
         setError(null);
 
-        // API URL from environment variables or fallback
-        const API_URL =
-          (import.meta as any).env?.VITE_API_URL || "http://localhost:8000";
-
-        // Fetch movie details - use by-tmdb-id endpoint since we're getting a TMDB ID from the URL
-        const movieResponse = await fetch(
-          `${API_URL}/api/v1/movies/tmdb/${movie_id}`
-        );
+        // Fetch movie details
+        const movieResponse = await fetch(`${API_URL}/movies/${movie_id}`);
         if (!movieResponse.ok) {
-          throw new Error(`Failed to fetch movie: ${movieResponse.statusText}`);
+          throw new Error("Failed to fetch movie details");
         }
-
         const movieData = await movieResponse.json();
         setMovie(movieData);
 
         // Fetch showings for this movie
         const showingsResponse = await fetch(
-          `${API_URL}/api/v1/showings?movie_id=${movie_id}`
+          `${API_URL}/screenings?movie_id=${movie_id}`
         );
-        if (!showingsResponse.ok) {
-          throw new Error(
-            `Failed to fetch showings: ${showingsResponse.statusText}`
-          );
-        }
 
-        const showingsData = await showingsResponse.json();
-        setShowings(showingsData);
+        if (showingsResponse.ok) {
+          const showingsData = await showingsResponse.json();
+          setShowings(showingsData);
+        } else {
+          setShowings([]);
+        }
 
         setLoading(false);
       } catch (err) {
@@ -208,7 +198,7 @@ const MovieDetailPage = () => {
     };
 
     fetchMovie();
-  }, [movie_id]);
+  }, [movie_id, API_URL]);
 
   const handleDateChange = (event: any) => {
     setSelectedDate(event.target.value);
@@ -287,7 +277,7 @@ const MovieDetailPage = () => {
       const endTime = new Date(startTime.getTime() + movie.runtime * 60 * 1000);
 
       // Now create the showing with the TMDB ID directly
-      const response = await fetch(`${API_URL}${API_VERSION}/showings`, {
+      const response = await fetch(`${API_URL}/screenings`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -299,7 +289,6 @@ const MovieDetailPage = () => {
           start_time: formData.start_time,
           end_time: endTime.toISOString(),
           price: formData.price,
-          showing_status: "scheduled", // Updated parameter name to match backend
         }),
       });
 
@@ -336,6 +325,47 @@ const MovieDetailPage = () => {
       setFormError(err instanceof Error ? err.message : "An error occurred");
     } finally {
       setAddingShowing(false);
+    }
+  };
+
+  const handleBookTicket = async (showingId: string) => {
+    // Check if user is authenticated
+    if (!token) {
+      navigate("/login", { state: { from: location.pathname } });
+      return;
+    }
+
+    try {
+      // Call reserve endpoint
+      const response = await fetch(`${API_URL}/reserve`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          screening_id: showingId,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to reserve ticket");
+      }
+
+      // On success, refresh showings to update available tickets
+      const showingsResponse = await fetch(
+        `${API_URL}/screenings?movie_id=${movie_id}`
+      );
+      if (showingsResponse.ok) {
+        const showingsData = await showingsResponse.json();
+        setShowings(showingsData);
+      }
+
+      // Show success message
+      alert("Ticket reserved successfully!");
+    } catch (error) {
+      console.error("Error reserving ticket:", error);
+      alert("Failed to reserve ticket. Please try again.");
     }
   };
 
@@ -495,9 +525,9 @@ const MovieDetailPage = () => {
                         <SeatIcon fontSize="small" />
                         <p
                           className="ml-1 text-sm"
-                          title={`Room: ${showing.room_name}`}
+                          title={`Room: ${showing.room}`}
                         >
-                          {showing.room_name}
+                          {showing.room}
                         </p>
                       </div>
                       <div className="flex items-center mb-2">
@@ -505,11 +535,17 @@ const MovieDetailPage = () => {
                           Price: ${showing.price.toFixed(2)}
                         </p>
                       </div>
+                      <p className="text-sm text-secondary-foreground">
+                        Available Tickets: {showing.available_tickets}
+                      </p>
                       <Button
                         className="mt-4 w-full"
-                        onClick={() => handleBookingClick(showing.id)}
+                        onClick={() => handleBookTicket(showing.id)}
+                        disabled={showing.available_tickets <= 0}
                       >
-                        Book Tickets
+                        {showing.available_tickets > 0
+                          ? "Book Ticket"
+                          : "Sold Out"}
                       </Button>
                     </CardContent>
                   </Card>
